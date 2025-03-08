@@ -1,4 +1,6 @@
-import { Inject, Injectable, ConflictException } from '@nestjs/common';
+import {
+  Inject, Injectable, ConflictException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { USER_REPOSITORY } from '../../users.providers';
@@ -9,6 +11,7 @@ export interface ICreateUserDTO {
   name: string;
   email: string;
   password: string;
+  institutionId: string;
   isAdmin?: boolean;
 }
 
@@ -37,6 +40,7 @@ export class CreateUserUseCase {
       email: data.email,
       password: hashedPassword,
       isAdmin: data.isAdmin || false,
+      institutionId: data.institutionId,
     });
 
     return this.userRepository.create(user);

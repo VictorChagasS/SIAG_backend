@@ -1,11 +1,13 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './controllers/auth.controller';
-import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+
+import { UsersModule } from '../users/users.module';
+
 import { authProviders } from './auth.providers';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { AdminGuard } from './guards/admin.guard';
+import { AdminGuard } from './domain/guards/admin.guard';
+import { JwtAuthGuard } from './domain/guards/jwt-auth.guard';
+import { AuthController } from './presentation/controllers/auth.controller';
 
 @Module({
   imports: [
@@ -31,4 +33,4 @@ import { AdminGuard } from './guards/admin.guard';
     AdminGuard,
   ],
 })
-export class AuthModule {} 
+export class AuthModule {}

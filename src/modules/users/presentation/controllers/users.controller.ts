@@ -2,10 +2,10 @@ import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,
 } from '@nestjs/common';
 
-import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
-import { AdminGuard } from '@/modules/auth/guards/admin.guard';
-import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
-import { IJwtPayload } from '@/modules/auth/types/jwt-payload.type';
+import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
+import { AdminGuard } from '@/modules/auth/domain/guards/admin.guard';
+import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
+import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 import { CreateUserUseCase } from '@/modules/users/domain/usecases/create-user.usecase';
 import { DeleteUserUseCase } from '@/modules/users/domain/usecases/delete-user.usecase';
 import { GetUserProfileUseCase } from '@/modules/users/domain/usecases/get-user-profile.usecase';
@@ -30,6 +30,7 @@ export class UsersController {
       email: createUserDto.email,
       password: createUserDto.password,
       isAdmin: createUserDto.isAdmin,
+      institutionId: createUserDto.institutionId,
     });
 
     return {

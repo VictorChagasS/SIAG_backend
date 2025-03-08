@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-interface ErrorResponse {
+interface IErrorResponse {
   code: string;
   title: string;
   detail: string[];
@@ -23,17 +23,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const errors: ErrorResponse[] = this.formatErrors(exception);
-    
+    const errors: IErrorResponse[] = this.formatErrors(exception);
+
     response.status(this.getStatusCode(exception)).json({ errors });
   }
 
-  private formatErrors(exception: unknown): ErrorResponse[] {
+  private formatErrors(exception: unknown): IErrorResponse[] {
     if (exception instanceof BadRequestException) {
       const response = exception.getResponse() as any;
       if (response.message && Array.isArray(response.message)) {
         const errorsByField = new Map<string, string[]>();
-        
+
         response.message.forEach((error: string) => {
           const field = this.extractFieldName(error);
           if (!errorsByField.has(field)) {
@@ -45,9 +45,35 @@ export class HttpExceptionFilter implements ExceptionFilter {
         return Array.from(errorsByField.entries()).map(([field, details]) => ({
           code: 'INVALID_DATA',
           title: `campo '${field}' é inválido`,
-          detail: details
+          detail: details,
         }));
       }
+    }
+
+    if (exception instanceof UnauthorizedException) {
+      const response = exception.getResponse() as any;
+      // Se tiver um formato personalizado, usa ele
+      if (response.code && response.title && response.detail) {
+        return [{
+          code: response.code,
+          title: response.title,
+          detail: response.detail,
+        }];
+      }
+      // Se tiver apenas mensagem, usa ela
+      if (response.message) {
+        return [{
+          code: 'UNAUTHORIZED',
+          title: 'Não autorizado',
+          detail: [response.message],
+        }];
+      }
+      // Caso contrário, usa o formato padrão
+      return [{
+        code: 'UNAUTHORIZED',
+        title: 'Não autorizado',
+        detail: ['Credenciais inválidas'],
+      }];
     }
 
     if (exception instanceof ConflictException) {
@@ -56,22 +82,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
         return [{
           code: response.code,
           title: response.title,
-          detail: response.detail
+          detail: response.detail,
         }];
       }
       // Caso contrário, usa o formato padrão
       return [{
         code: 'CONFLICT',
         title: 'Conflito de dados',
-        detail: [response.message || 'Ocorreu um conflito ao processar sua requisição']
-      }];
-    }
-
-    if (exception instanceof UnauthorizedException) {
-      return [{
-        code: 'UNAUTHORIZED',
-        title: 'Não autorizado',
-        detail: ['Credenciais inválidas']
+        detail: [response.message || 'Ocorreu um conflito ao processar sua requisição'],
       }];
     }
 
@@ -79,7 +97,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return [{
         code: 'FORBIDDEN',
         title: 'Acesso negado',
-        detail: ['Você não tem permissão para acessar este recurso']
+        detail: ['Você não tem permissão para acessar este recurso'],
       }];
     }
 
@@ -87,7 +105,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return [{
         code: 'NOT_FOUND',
         title: 'Recurso não encontrado',
-        detail: ['O recurso solicitado não foi encontrado']
+        detail: ['O recurso solicitado não foi encontrado'],
       }];
     }
 
@@ -95,14 +113,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return [{
         code: 'INTERNAL_ERROR',
         title: 'Erro interno',
-        detail: [exception.message]
+        detail: [exception.message],
       }];
     }
 
     return [{
       code: 'INTERNAL_ERROR',
       title: 'Erro interno do servidor',
-      detail: ['Ocorreu um erro inesperado']
+      detail: ['Ocorreu um erro inesperado'],
     }];
   }
 
@@ -110,12 +128,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // Primeiro, tenta encontrar o padrão "field 'nome'"
     const fieldMatch = error.match(/(?:field|property) '(\w+)'/i);
     if (fieldMatch) return fieldMatch[1];
-    
+
     // Se não encontrar, tenta extrair o nome do campo diretamente da mensagem
     // Por exemplo: "name should not be empty" -> "name"
     const directMatch = error.match(/^(\w+)\s+(?:should|must|is)/i);
     if (directMatch) return directMatch[1];
-    
+
     // Se ainda não encontrou, procura por outros padrões comuns
     const otherPatterns = error.match(/^(\w+).*(?:is required|cannot be)/i);
     if (otherPatterns) return otherPatterns[1];
@@ -134,4 +152,4 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
     return 500;
   }
-} 
+}

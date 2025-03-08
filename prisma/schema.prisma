@@ -14,11 +14,29 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  isAdmin   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String     @id @default(uuid())
+  name          String
+  email         String     @unique
+  password      String
+  isAdmin       Boolean    @default(false)
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  institutionId String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([institutionId])
+
+  @@map("users")
+}
+
+model Institution {
+  id      String @id // Código da IES
+  name    String @unique
+  acronym String? // Institution acronym (e.g., UFMG, USP)
+  users   User[]
+
+  @@index([name])
+  @@index([acronym])
+
+  @@map("institutions")
 }

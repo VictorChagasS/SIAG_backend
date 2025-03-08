@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../../../../prisma/prisma.service';
-import { User } from '../../../domain/entities/user.entity';
-import { IUserRepository } from '../../../domain/repositories/user-repository.interface';
+import { User } from '@/modules/users/domain/entities/user.entity';
+import { IUserRepository } from '@/modules/users/domain/repositories/user-repository.interface';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -15,6 +15,10 @@ export class PrismaUserRepository implements IUserRepository {
         email: user.email,
         password: user.password,
         isAdmin: user.isAdmin,
+        institutionId: user.institutionId,
+      },
+      include: {
+        institution: true,
       },
     });
 
@@ -24,6 +28,9 @@ export class PrismaUserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        institution: true,
+      },
     });
 
     if (!user) return null;
@@ -34,6 +41,9 @@ export class PrismaUserRepository implements IUserRepository {
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        institution: true,
+      },
     });
 
     if (!user) return null;
@@ -45,6 +55,9 @@ export class PrismaUserRepository implements IUserRepository {
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: userData,
+      include: {
+        institution: true,
+      },
     });
 
     return this.mapToEntity(updatedUser);
@@ -58,10 +71,12 @@ export class PrismaUserRepository implements IUserRepository {
 
   private mapToEntity(prismaUser: any): User {
     return new User({
+      id: prismaUser.id,
       name: prismaUser.name,
       email: prismaUser.email,
       password: prismaUser.password,
       isAdmin: prismaUser.isAdmin,
+      institutionId: prismaUser.institutionId,
     });
   }
 }

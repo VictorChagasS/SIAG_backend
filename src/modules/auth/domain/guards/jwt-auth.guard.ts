@@ -15,14 +15,29 @@ export class JwtAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token não fornecido');
+      throw new UnauthorizedException({
+        code: 'TOKEN_NOT_PROVIDED',
+        title: 'Token não fornecido',
+        detail: ['É necessário fornecer um token de autenticação'],
+      });
     }
 
     try {
       const payload = await this.jwtService.verifyAsync<IJwtPayload>(token);
+      if (!payload.sub || !payload.email) {
+        throw new UnauthorizedException({
+          code: 'INVALID_TOKEN_PAYLOAD',
+          title: 'Token inválido',
+          detail: ['O token não contém todas as informações necessárias'],
+        });
+      }
       request.user = payload;
-    } catch {
-      throw new UnauthorizedException('Token inválido');
+    } catch (error) {
+      throw new UnauthorizedException({
+        code: 'INVALID_TOKEN',
+        title: 'Token inválido',
+        detail: ['O token fornecido é inválido ou expirou'],
+      });
     }
 
     return true;

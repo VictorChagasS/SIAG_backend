@@ -2,7 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { IUserRepository } from '../../users/domain/repositories/user-repository.interface';
+import { IJwtPayload } from '../types/jwt-payload.type';
+
+import { IUserRepository } from '@/modules/users/domain/repositories/user-repository.interface';
 
 export interface IAuthenticateUserDTO {
   email: string;
@@ -30,27 +32,42 @@ export class AuthenticateUserUseCase {
     const user = await this.userRepository.findByEmail(data.email);
 
     if (!user) {
-      throw new UnauthorizedException('Email ou senha incorretos');
+      throw new UnauthorizedException({
+        code: 'INVALID_CREDENTIALS',
+        title: 'Credenciais inválidas',
+        detail: ['Email ou senha incorretos'],
+      });
     }
 
     const passwordMatch = await bcrypt.compare(data.password, user.password);
 
     if (!passwordMatch) {
-      throw new UnauthorizedException('Email ou senha incorretos');
+      throw new UnauthorizedException({
+        code: 'INVALID_CREDENTIALS',
+        title: 'Credenciais inválidas',
+        detail: ['Email ou senha incorretos'],
+      });
     }
 
-    const payload = {
+    const payload: IJwtPayload = {
       sub: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    console.log('Gerando token com payload:', payload);
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    // Verifica se o token foi gerado corretamente
+    const decoded = this.jwtService.decode(accessToken);
+    console.log('Token decodificado após geração:', decoded);
 
     return {
       accessToken,
       user: {
-        id: user.id!,
+        id: user.id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
