@@ -6,7 +6,9 @@ services:
       target: production
       dockerfile: ./Dockerfile
     image: siag-api-prod
-    command: ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    command: ["sh", "-c", "npx prisma migrate deploy && ts-node src/scripts/import-universities.ts && npm run start:prod"]
     ports:
       - 3000:3000
     volumes:

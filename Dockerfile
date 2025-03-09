@@ -16,10 +16,15 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+# Instalando ts-node globalmente
+RUN npm install -g ts-node typescript
+
+# Instalando dependências de produção
 RUN npm install --only=production
 
 COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/prisma ./prisma
+COPY --from=development /usr/src/app/src/scripts ./src/scripts
 
 RUN npx prisma generate
 
