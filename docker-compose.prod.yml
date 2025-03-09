@@ -1,0 +1,15 @@
+services:
+  includio-api-prod:
+    container_name: includio-api-prod
+    build:
+      context: .
+      target: production
+      dockerfile: ./Dockerfile
+    image: includio-api-prod
+    command: ["sh", "-c", "npm run migration:run:prod && npm run start:prod"]
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped

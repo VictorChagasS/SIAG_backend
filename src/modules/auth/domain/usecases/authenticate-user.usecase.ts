@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { IJwtPayload } from '../types/jwt-payload.type';
-
 import { IUserRepository } from '@/modules/users/domain/repositories/user-repository.interface';
+
+import { IJwtPayload } from '../types/jwt-payload.type';
 
 export interface IAuthenticateUserDTO {
   email: string;
@@ -55,14 +55,9 @@ export class AuthenticateUserUseCase {
       isAdmin: user.isAdmin,
     };
 
-    console.log('Gerando token com payload:', payload);
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
     });
-
-    // Verifica se o token foi gerado corretamente
-    const decoded = this.jwtService.decode(accessToken);
-    console.log('Token decodificado após geração:', decoded);
 
     return {
       accessToken,

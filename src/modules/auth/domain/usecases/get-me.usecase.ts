@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { IJwtPayload } from '../types/jwt-payload.type';
-
 import { IUserRepository } from '@/modules/users/domain/repositories/user-repository.interface';
+
+import { IJwtPayload } from '../types/jwt-payload.type';
 
 @Injectable()
 export class GetMeUseCase {
@@ -11,7 +11,6 @@ export class GetMeUseCase {
   ) {}
 
   async execute(user: IJwtPayload) {
-    console.log(user.exp, user.iat, user.sub);
     const userInfo = await this.userRepository.findById(user.sub);
 
     if (!userInfo) {
