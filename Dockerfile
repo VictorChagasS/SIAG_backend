@@ -21,6 +21,8 @@ RUN npm install --only=production
 COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/prisma ./prisma
 
+RUN npx prisma generate
+
 EXPOSE 3000
 
 CMD ["node", "dist/main"] 
