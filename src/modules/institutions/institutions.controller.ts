@@ -23,13 +23,13 @@ export class InstitutionsController {
           {
             name: {
               contains: search,
-              mode: Prisma.QueryMode.insensitive,
+              mode: 'insensitive',
             },
           },
           {
             acronym: {
               equals: search,
-              mode: Prisma.QueryMode.insensitive,
+              mode: 'insensitive',
             },
           },
           // {
@@ -79,13 +79,13 @@ export class InstitutionsController {
           {
             name: {
               contains: search,
-              mode: Prisma.QueryMode.insensitive,
+              mode: 'insensitive',
             },
           },
           {
             acronym: {
               contains: search,
-              mode: Prisma.QueryMode.insensitive,
+              mode: 'insensitive',
             },
           },
         ],

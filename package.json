@@ -23,7 +23,8 @@
     "docker:logs": "docker-compose logs -f",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "import:universities": "ts-node src/scripts/import-universities.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
