@@ -19,8 +19,10 @@ model User {
   email         String     @unique
   password      String
   isAdmin       Boolean    @default(false)
+  currentPeriod String?    @default(dbgenerated("CONCAT(EXTRACT(YEAR FROM CURRENT_DATE)::TEXT, '.', CASE WHEN EXTRACT(MONTH FROM CURRENT_DATE) > 6 THEN '2' ELSE '1' END)")) // Período atual do usuário (ex: "2025.2")
   institution   Institution @relation(fields: [institutionId], references: [id])
   institutionId String
+  classes       Class[]    @relation("TeacherClasses")
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -39,4 +41,95 @@ model Institution {
   @@index([acronym])
 
   @@map("institutions")
+}
+
+model Class {
+  id        String   @id @default(uuid())
+  name      String
+  period    String   // Período no formato "year.period" (ex: "2025.2")
+  teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id])
+  teacherId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relações com unidades e estudantes
+  units     Unit[]
+  students  Student[]
+
+  @@index([teacherId])
+  @@index([period])
+
+  @@map("classes")
+}
+
+// Modelo para representar um estudante em uma turma
+model Student {
+  id          String   @id @default(uuid())
+  name        String
+  email       String?
+  registration String   // Matrícula ou identificação do estudante
+  class       Class    @relation(fields: [classId], references: [id])
+  classId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relação com notas
+  grades      Grade[]
+
+  @@unique([registration, classId]) // Um estudante só pode estar matriculado uma vez em cada turma
+  @@index([registration])
+  @@index([classId])
+
+  @@map("students")
+}
+
+// Modelo para representar uma unidade de uma turma
+model Unit {
+  id            String   @id @default(uuid())
+  name          String
+  class         Class    @relation(fields: [classId], references: [id])
+  classId       String
+  averageFormula String   // Fórmula personalizada para cálculo da média da unidade
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  // Relação com itens avaliativos
+  evaluationItems EvaluationItem[]
+
+  @@index([classId])
+
+  @@map("units")
+}
+
+// Modelo para representar um item avaliativo de uma unidade
+model EvaluationItem {
+  id            String   @id @default(uuid())
+  name          String
+  unit          Unit     @relation(fields: [unitId], references: [id])
+  unitId        String
+  averageFormula String?  // Fórmula personalizada para cálculo da nota do item avaliativo
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  // Relação com notas
+  grades        Grade[]
+
+  @@index([unitId])
+
+  @@map("evaluation_items")
+}
+
+// Modelo para representar a nota de um estudante em um item avaliativo
+model Grade {
+  id                String         @id @default(uuid())
+  student           Student        @relation(fields: [studentId], references: [id])
+  studentId         String
+  evaluationItem    EvaluationItem @relation(fields: [evaluationItemId], references: [id])
+  evaluationItemId  String
+  value             Float
+  comments          String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([studentId, evaluationItemId]) // Um estudante só pode ter uma nota para cada item avaliativo
+  @@index([studentId])
+  @@index([evaluationItemId])
+
+  @@map("grades")
 }

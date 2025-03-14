@@ -77,6 +77,7 @@ export class PrismaUserRepository implements IUserRepository {
       password: prismaUser.password,
       isAdmin: prismaUser.isAdmin,
       institutionId: prismaUser.institutionId,
+      currentPeriod: prismaUser.currentPeriod,
     });
   }
 }

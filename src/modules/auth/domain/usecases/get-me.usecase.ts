@@ -21,14 +21,8 @@ export class GetMeUseCase {
       });
     }
 
-    return {
-      id: userInfo.id,
-      name: userInfo.name,
-      email: userInfo.email,
-      isAdmin: userInfo.isAdmin,
-      institutionId: userInfo.institutionId,
-      createdAt: userInfo.createdAt,
-      updatedAt: userInfo.updatedAt,
-    };
+    const { password, ...userRest } = userInfo;
+
+    return userRest;
   }
 }
