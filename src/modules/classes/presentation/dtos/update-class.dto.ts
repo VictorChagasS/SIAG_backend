@@ -9,6 +9,10 @@ export class UpdateClassDto {
 
   @IsString()
   @IsOptional()
+    code?: string;
+
+  @IsString()
+  @IsOptional()
   @Matches(/^\d{4}\.\d+$/, {
     message: 'O período deve estar no formato "YYYY.N" (ex: "2025.2")',
   })

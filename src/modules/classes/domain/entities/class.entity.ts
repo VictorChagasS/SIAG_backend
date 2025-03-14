@@ -3,6 +3,8 @@ export class Class {
 
   name: string;
 
+  code?: string;
+
   period: string; // Formato: "year.period" (ex: "2025.2")
 
   teacherId: string;

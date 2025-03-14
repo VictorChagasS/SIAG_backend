@@ -6,6 +6,7 @@ import { IClassRepository } from '../repositories/class-repository.interface';
 
 export interface ICreateClassDTO {
   name: string;
+  code: string;
   period: string;
   teacherId: string;
 }
@@ -33,6 +34,7 @@ export class CreateClassUseCase {
 
     const newClass = new Class({
       name: data.name,
+      code: data.code,
       period: data.period,
       teacherId: data.teacherId,
     });

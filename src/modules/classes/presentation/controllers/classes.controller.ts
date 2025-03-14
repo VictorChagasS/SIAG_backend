@@ -41,6 +41,7 @@ export class ClassesController {
 
     const classCreated = await this.createClassUseCase.execute({
       name: createClassDto.name,
+      code: createClassDto.code,
       period: createClassDto.period,
       teacherId,
     });
@@ -48,6 +49,7 @@ export class ClassesController {
     return {
       id: classCreated.id,
       name: classCreated.name,
+      code: classCreated.code,
       period: classCreated.period,
       createdAt: classCreated.createdAt,
       updatedAt: classCreated.updatedAt,
@@ -62,6 +64,7 @@ export class ClassesController {
     return classes.map((classItem) => ({
       id: classItem.id,
       name: classItem.name,
+      code: classItem.code,
       period: classItem.period,
       createdAt: classItem.createdAt,
       updatedAt: classItem.updatedAt,
@@ -76,6 +79,7 @@ export class ClassesController {
     return classes.map((classItem) => ({
       id: classItem.id,
       name: classItem.name,
+      code: classItem.code,
       period: classItem.period,
       createdAt: classItem.createdAt,
       updatedAt: classItem.updatedAt,
@@ -87,13 +91,7 @@ export class ClassesController {
   async findAllByTeacher(@CurrentUser() currentUser: IJwtPayload) {
     const classes = await this.listTeacherClassesUseCase.execute(currentUser.sub);
 
-    return classes.map((classItem) => ({
-      id: classItem.id,
-      name: classItem.name,
-      period: classItem.period,
-      createdAt: classItem.createdAt,
-      updatedAt: classItem.updatedAt,
-    }));
+    return classes;
   }
 
   @Get('my-classes/active')
@@ -101,13 +99,7 @@ export class ClassesController {
   async findAllActiveByTeacher(@CurrentUser() currentUser: IJwtPayload) {
     const classes = await this.listActiveTeacherClassesUseCase.execute(currentUser.sub);
 
-    return classes.map((classItem) => ({
-      id: classItem.id,
-      name: classItem.name,
-      period: classItem.period,
-      createdAt: classItem.createdAt,
-      updatedAt: classItem.updatedAt,
-    }));
+    return classes;
   }
 
   @Get(':id')
@@ -118,6 +110,7 @@ export class ClassesController {
     return {
       id: classFound.id,
       name: classFound.name,
+      code: classFound.code,
       period: classFound.period,
       createdAt: classFound.createdAt,
       updatedAt: classFound.updatedAt,
@@ -137,18 +130,24 @@ export class ClassesController {
       currentUser.sub,
     );
 
-    return {
-      id: classUpdated.id,
-      name: classUpdated.name,
-      period: classUpdated.period,
-      createdAt: classUpdated.createdAt,
-      updatedAt: classUpdated.updatedAt,
-    };
+    return classUpdated;
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
-    await this.deleteClassUseCase.execute(id);
+    const deletedClass = await this.deleteClassUseCase.execute(id);
+
+    return {
+      message: 'Classe excluída com sucesso',
+      data: {
+        id: deletedClass.id,
+        name: deletedClass.name,
+        code: deletedClass.code,
+        period: deletedClass.period,
+        createdAt: deletedClass.createdAt,
+        updatedAt: deletedClass.updatedAt,
+      },
+    };
   }
 }

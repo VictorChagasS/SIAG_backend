@@ -14,6 +14,7 @@ export class PrismaClassRepository implements IClassRepository {
         name: classData.name,
         period: classData.period,
         teacherId: classData.teacherId,
+        code: classData?.code,
       },
     });
 

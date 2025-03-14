@@ -10,8 +10,10 @@ import { CreateUserUseCase } from '@/modules/users/domain/usecases/create-user.u
 import { DeleteUserUseCase } from '@/modules/users/domain/usecases/delete-user.usecase';
 import { GetUserProfileUseCase } from '@/modules/users/domain/usecases/get-user-profile.usecase';
 import { ListUsersUseCase } from '@/modules/users/domain/usecases/list-users.usecase';
-import { IUpdateUserDTO, UpdateUserUseCase } from '@/modules/users/domain/usecases/update-user.usecase';
 import { CreateUserDto } from '@/modules/users/presentation/dtos/create-user.dto';
+import { UpdateUserDto } from '@/modules/users/presentation/dtos/update-user.dto';
+
+import { UpdateUserUseCase } from '../../domain/usecases/update-user.usecase';
 
 @Controller('users')
 export class UsersController {
@@ -74,31 +76,37 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async update(
   @Param('id') id: string,
-    @Body() updateUserDto: IUpdateUserDTO,
-    @CurrentUser() currentUser: IJwtPayload,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
-    // Verifica se o usuário está tentando atualizar seu próprio perfil ou se é admin
-    if (id !== currentUser.sub && !currentUser.isAdmin) {
-      throw new Error('Você não tem permissão para atualizar este usuário');
-    }
-
-    // Apenas admins podem atualizar o campo isAdmin
-    if (updateUserDto.isAdmin !== undefined && !currentUser.isAdmin) {
-      throw new Error('Apenas administradores podem alterar o status de administrador');
-    }
-
-    const updatedUser = await this.updateUserUseCase.execute(id, updateUserDto);
+    const { before, after } = await this.updateUserUseCase.execute(id, updateUserDto);
 
     return {
-      id: updatedUser.id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      isAdmin: updatedUser.isAdmin,
-      createdAt: updatedUser.createdAt,
-      updatedAt: updatedUser.updatedAt,
+      message: 'Usuário atualizado com sucesso',
+      data: {
+        before: {
+          id: before.id,
+          name: before.name,
+          email: before.email,
+          isAdmin: before.isAdmin,
+          currentPeriod: before.currentPeriod,
+          institutionId: before.institutionId,
+          createdAt: before.createdAt,
+          updatedAt: before.updatedAt,
+        },
+        after: {
+          id: after.id,
+          name: after.name,
+          email: after.email,
+          isAdmin: after.isAdmin,
+          currentPeriod: after.currentPeriod,
+          institutionId: after.institutionId,
+          createdAt: after.createdAt,
+          updatedAt: after.updatedAt,
+        },
+      },
     };
   }
 

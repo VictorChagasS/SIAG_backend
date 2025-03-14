@@ -46,6 +46,7 @@ model Institution {
 model Class {
   id        String   @id @default(uuid())
   name      String
+  code      String?   // Código da turma
   period    String   // Período no formato "year.period" (ex: "2025.2")
   teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id])
   teacherId String
@@ -57,6 +58,7 @@ model Class {
 
   @@index([teacherId])
   @@index([period])
+  @@index([code])
 
   @@map("classes")
 }

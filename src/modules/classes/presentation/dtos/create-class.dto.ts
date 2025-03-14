@@ -1,11 +1,15 @@
 import {
-  IsNotEmpty, IsString, Matches,
+  IsNotEmpty, IsOptional, IsString, Matches,
 } from 'class-validator';
 
 export class CreateClassDto {
   @IsString()
   @IsNotEmpty()
     name: string;
+
+  @IsString()
+  @IsOptional()
+    code?: string;
 
   @IsString()
   @IsNotEmpty()

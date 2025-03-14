@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { CLASS_REPOSITORY } from '../../classes.providers';
+import { Class } from '../entities/class.entity';
 import { IClassRepository } from '../repositories/class-repository.interface';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class DeleteClassUseCase {
     private classRepository: IClassRepository,
   ) {}
 
-  async execute(id: string): Promise<void> {
+  async execute(id: string): Promise<Class> {
     const classExists = await this.classRepository.findById(id);
 
     if (!classExists) {
@@ -18,5 +19,7 @@ export class DeleteClassUseCase {
     }
 
     await this.classRepository.delete(id);
+
+    return classExists;
   }
-} 
+}
