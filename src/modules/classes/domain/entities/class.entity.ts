@@ -9,6 +9,8 @@ export class Class {
 
   teacherId: string;
 
+  averageFormula?: string; // Fórmula personalizada para cálculo da média da turma
+
   createdAt?: Date;
 
   updatedAt?: Date;

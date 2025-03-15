@@ -50,6 +50,7 @@ model Class {
   period    String   // Período no formato "year.period" (ex: "2025.2")
   teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id])
   teacherId String
+  averageFormula String?  // Fórmula personalizada para cálculo da média da turma
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // Relações com unidades e estudantes
@@ -87,7 +88,7 @@ model Student {
 model Unit {
   id            String   @id @default(uuid())
   name          String
-  class         Class    @relation(fields: [classId], references: [id])
+  class         Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
   classId       String
   averageFormula String?   // Fórmula personalizada para cálculo da média da unidade
   createdAt     DateTime @default(now())
@@ -104,9 +105,8 @@ model Unit {
 model EvaluationItem {
   id            String   @id @default(uuid())
   name          String
-  unit          Unit     @relation(fields: [unitId], references: [id])
+  unit          Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
   unitId        String
-  averageFormula String?  // Fórmula personalizada para cálculo da nota do item avaliativo
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   // Relação com notas
@@ -120,9 +120,9 @@ model EvaluationItem {
 // Modelo para representar a nota de um estudante em um item avaliativo
 model Grade {
   id                String         @id @default(uuid())
-  student           Student        @relation(fields: [studentId], references: [id])
+  student           Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId         String
-  evaluationItem    EvaluationItem @relation(fields: [evaluationItemId], references: [id])
+  evaluationItem    EvaluationItem @relation(fields: [evaluationItemId], references: [id], onDelete: Cascade)
   evaluationItemId  String
   value             Float
   comments          String?

@@ -2,30 +2,29 @@ import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 
-import { UNIT_REPOSITORY } from '../../units.providers';
-import { Unit } from '../entities/unit.entity';
-import { IUnitRepository } from '../repositories/unit-repository.interface';
+import { EVALUATION_ITEM_REPOSITORY } from '../../evaluation-items.providers';
+import { EvaluationItem } from '../entities/evaluation-item.entity';
+import { IEvaluationItemRepository } from '../repositories/evaluation-item-repository.interface';
 
 import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
+import { IUnitRepository } from '@/modules/units/domain/repositories/unit-repository.interface';
+import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
 
 @Injectable()
-export class DeleteUnitUseCase {
+export class ListEvaluationItemsByUnitUseCase {
   constructor(
+    @Inject(EVALUATION_ITEM_REPOSITORY)
+    private evaluationItemRepository: IEvaluationItemRepository,
     @Inject(UNIT_REPOSITORY)
     private unitRepository: IUnitRepository,
     @Inject(CLASS_REPOSITORY)
     private classRepository: IClassRepository,
   ) {}
 
-  /**
-   * Exclui uma unidade e todos os seus itens avaliativos e notas relacionadas (em cascata).
-   * A exclusão em cascata é gerenciada pelo Prisma através da configuração onDelete: Cascade
-   * nas relações entre Unit -> EvaluationItem -> Grade.
-   */
-  async execute(id: string, teacherId: string): Promise<Unit> {
+  async execute(unitId: string, teacherId: string): Promise<EvaluationItem[]> {
     // Verificar se a unidade existe
-    const unit = await this.unitRepository.findById(id);
+    const unit = await this.unitRepository.findById(unitId);
     if (!unit) {
       throw new NotFoundException('Unidade não encontrada');
     }
@@ -39,14 +38,10 @@ export class DeleteUnitUseCase {
     // Verificar se o professor é o dono da turma
     if (classExists.teacherId !== teacherId) {
       throw new ForbiddenException(
-        'Você não tem permissão para excluir unidades desta turma',
+        'Você não tem permissão para visualizar os itens avaliativos desta unidade',
       );
     }
 
-    // Ao excluir a unidade, todos os itens avaliativos e notas relacionadas
-    // serão excluídos automaticamente devido à configuração onDelete: Cascade no Prisma
-    await this.unitRepository.delete(id);
-
-    return unit;
+    return this.evaluationItemRepository.findByUnitId(unitId);
   }
 }

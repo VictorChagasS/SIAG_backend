@@ -10,7 +10,7 @@ import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 
 @Injectable()
-export class DeleteUnitUseCase {
+export class UpdateUnitFormulaUseCase {
   constructor(
     @Inject(UNIT_REPOSITORY)
     private unitRepository: IUnitRepository,
@@ -18,12 +18,7 @@ export class DeleteUnitUseCase {
     private classRepository: IClassRepository,
   ) {}
 
-  /**
-   * Exclui uma unidade e todos os seus itens avaliativos e notas relacionadas (em cascata).
-   * A exclusão em cascata é gerenciada pelo Prisma através da configuração onDelete: Cascade
-   * nas relações entre Unit -> EvaluationItem -> Grade.
-   */
-  async execute(id: string, teacherId: string): Promise<Unit> {
+  async execute(id: string, formula: string, teacherId: string): Promise<Unit> {
     // Verificar se a unidade existe
     const unit = await this.unitRepository.findById(id);
     if (!unit) {
@@ -39,14 +34,11 @@ export class DeleteUnitUseCase {
     // Verificar se o professor é o dono da turma
     if (classExists.teacherId !== teacherId) {
       throw new ForbiddenException(
-        'Você não tem permissão para excluir unidades desta turma',
+        'Você não tem permissão para atualizar esta unidade',
       );
     }
 
-    // Ao excluir a unidade, todos os itens avaliativos e notas relacionadas
-    // serão excluídos automaticamente devido à configuração onDelete: Cascade no Prisma
-    await this.unitRepository.delete(id);
-
-    return unit;
+    // Atualizar apenas a fórmula de cálculo
+    return this.unitRepository.update(id, { averageFormula: formula });
   }
 }

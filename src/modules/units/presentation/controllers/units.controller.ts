@@ -6,9 +6,11 @@ import { CreateUnitUseCase } from '../../domain/usecases/create-unit.usecase';
 import { DeleteUnitUseCase } from '../../domain/usecases/delete-unit.usecase';
 import { GetUnitUseCase } from '../../domain/usecases/get-unit.usecase';
 import { ListUnitsByClassUseCase } from '../../domain/usecases/list-units-by-class.usecase';
+import { UpdateUnitFormulaUseCase } from '../../domain/usecases/update-unit-formula.usecase';
 import { UpdateUnitUseCase } from '../../domain/usecases/update-unit.usecase';
 import { UpsertUnitUseCase } from '../../domain/usecases/upsert-unit.usecase';
 import { CreateUnitDto } from '../dtos/create-unit.dto';
+import { UpdateUnitFormulaDto } from '../dtos/update-unit-formula.dto';
 import { UpdateUnitDto } from '../dtos/update-unit.dto';
 import { UpsertUnitDto } from '../dtos/upsert-unit.dto';
 
@@ -25,6 +27,7 @@ export class UnitsController {
     private updateUnitUseCase: UpdateUnitUseCase,
     private deleteUnitUseCase: DeleteUnitUseCase,
     private upsertUnitUseCase: UpsertUnitUseCase,
+    private updateUnitFormulaUseCase: UpdateUnitFormulaUseCase,
   ) {}
 
   @Post(':classId')
@@ -104,10 +107,28 @@ export class UnitsController {
     return updatedUnit;
   }
 
+  @Patch('/:id/formula')
+  @UseGuards(JwtAuthGuard)
+  async updateFormula(
+  @Param('classId') classId: string,
+    @Param('id') id: string,
+    @Body() updateUnitFormulaDto: UpdateUnitFormulaDto,
+    @CurrentUser() currentUser: IJwtPayload,
+  ) {
+    const updatedUnit = await this.updateUnitFormulaUseCase.execute(
+      id,
+      updateUnitFormulaDto.formula,
+      currentUser.sub,
+    );
+
+    return updatedUnit;
+  }
+
   @Delete(':classId/:id')
   @UseGuards(JwtAuthGuard)
   async delete(
-  @Param('id') id: string,
+  @Param('classId') classId: string,
+    @Param('id') id: string,
     @CurrentUser() currentUser: IJwtPayload,
   ) {
     const deletedUnit = await this.deleteUnitUseCase.execute(id, currentUser.sub);

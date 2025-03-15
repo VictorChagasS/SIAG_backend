@@ -9,6 +9,7 @@ import { ListActiveClassesUseCase } from '@/modules/classes/domain/usecases/list
 import { ListActiveTeacherClassesUseCase } from '@/modules/classes/domain/usecases/list-active-teacher-classes.usecase';
 import { ListClassesUseCase } from '@/modules/classes/domain/usecases/list-classes.usecase';
 import { ListTeacherClassesUseCase } from '@/modules/classes/domain/usecases/list-teacher-classes.usecase';
+import { UpdateClassFormulaUseCase } from '@/modules/classes/domain/usecases/update-class-formula.usecase';
 import { UpdateClassUseCase } from '@/modules/classes/domain/usecases/update-class.usecase';
 import { ClassesController } from '@/modules/classes/presentation/controllers/classes.controller';
 
@@ -23,6 +24,7 @@ import { ClassesController } from '@/modules/classes/presentation/controllers/cl
     ListTeacherClassesUseCase,
     ListActiveTeacherClassesUseCase,
     UpdateClassUseCase,
+    UpdateClassFormulaUseCase,
     DeleteClassUseCase,
     ...classesProviders,
   ],

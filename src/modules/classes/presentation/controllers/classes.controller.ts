@@ -13,8 +13,10 @@ import { ListActiveClassesUseCase } from '@/modules/classes/domain/usecases/list
 import { ListActiveTeacherClassesUseCase } from '@/modules/classes/domain/usecases/list-active-teacher-classes.usecase';
 import { ListClassesUseCase } from '@/modules/classes/domain/usecases/list-classes.usecase';
 import { ListTeacherClassesUseCase } from '@/modules/classes/domain/usecases/list-teacher-classes.usecase';
+import { UpdateClassFormulaUseCase } from '@/modules/classes/domain/usecases/update-class-formula.usecase';
 import { UpdateClassUseCase } from '@/modules/classes/domain/usecases/update-class.usecase';
 import { CreateClassDto } from '@/modules/classes/presentation/dtos/create-class.dto';
+import { UpdateClassFormulaDto } from '@/modules/classes/presentation/dtos/update-class-formula.dto';
 import { UpdateClassDto } from '@/modules/classes/presentation/dtos/update-class.dto';
 
 @Controller('classes')
@@ -27,6 +29,7 @@ export class ClassesController {
     private readonly listTeacherClassesUseCase: ListTeacherClassesUseCase,
     private readonly listActiveTeacherClassesUseCase: ListActiveTeacherClassesUseCase,
     private readonly updateClassUseCase: UpdateClassUseCase,
+    private readonly updateClassFormulaUseCase: UpdateClassFormulaUseCase,
     private readonly deleteClassUseCase: DeleteClassUseCase,
   ) {}
 
@@ -99,6 +102,22 @@ export class ClassesController {
     const classUpdated = await this.updateClassUseCase.execute(
       id,
       updateClassDto,
+      currentUser.sub,
+    );
+
+    return classUpdated;
+  }
+
+  @Patch(':id/formula')
+  @UseGuards(JwtAuthGuard)
+  async updateFormula(
+  @Param('id') id: string,
+    @Body() updateClassFormulaDto: UpdateClassFormulaDto,
+    @CurrentUser() currentUser: IJwtPayload,
+  ) {
+    const classUpdated = await this.updateClassFormulaUseCase.execute(
+      id,
+      updateClassFormulaDto.formula,
       currentUser.sub,
     );
 
