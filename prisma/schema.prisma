@@ -89,7 +89,7 @@ model Unit {
   name          String
   class         Class    @relation(fields: [classId], references: [id])
   classId       String
-  averageFormula String   // Fórmula personalizada para cálculo da média da unidade
+  averageFormula String?   // Fórmula personalizada para cálculo da média da unidade
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   // Relação com itens avaliativos

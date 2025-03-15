@@ -1,0 +1,34 @@
+import { Module } from '@nestjs/common';
+
+import { CreateUnitUseCase } from './domain/usecases/create-unit.usecase';
+import { DeleteUnitUseCase } from './domain/usecases/delete-unit.usecase';
+import { GetUnitUseCase } from './domain/usecases/get-unit.usecase';
+import { ListUnitsByClassUseCase } from './domain/usecases/list-units-by-class.usecase';
+import { UpdateUnitUseCase } from './domain/usecases/update-unit.usecase';
+import { UpsertUnitUseCase } from './domain/usecases/upsert-unit.usecase';
+import { PrismaUnitRepository } from './infra/prisma/repositories/prisma-unit.repository';
+import { UnitsController } from './presentation/controllers/units.controller';
+import { UNIT_REPOSITORY } from './units.providers';
+
+import { AuthModule } from '@/modules/auth/auth.module';
+import { ClassesModule } from '@/modules/classes/classes.module';
+import { PrismaModule } from '@/prisma/prisma.module';
+
+@Module({
+  imports: [PrismaModule, ClassesModule, AuthModule],
+  controllers: [UnitsController],
+  providers: [
+    {
+      provide: UNIT_REPOSITORY,
+      useClass: PrismaUnitRepository,
+    },
+    CreateUnitUseCase,
+    GetUnitUseCase,
+    ListUnitsByClassUseCase,
+    UpdateUnitUseCase,
+    DeleteUnitUseCase,
+    UpsertUnitUseCase,
+  ],
+  exports: [UNIT_REPOSITORY],
+})
+export class UnitsModule {}

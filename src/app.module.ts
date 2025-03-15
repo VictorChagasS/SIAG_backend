@@ -5,6 +5,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { ClassesModule } from '@/modules/classes/classes.module';
 import { InstitutionsModule } from '@/modules/institutions/institutions.module';
 import { StudentsModule } from '@/modules/students/students.module';
+import { UnitsModule } from '@/modules/units/units.module';
 import { UsersModule } from '@/modules/users/users.module';
 import { PrismaModule } from '@/prisma/prisma.module';
 
@@ -19,6 +20,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
     ClassesModule,
     InstitutionsModule,
     StudentsModule,
+    UnitsModule,
   ],
 })
 export class AppModule {}

@@ -46,14 +46,7 @@ export class ClassesController {
       teacherId,
     });
 
-    return {
-      id: classCreated.id,
-      name: classCreated.name,
-      code: classCreated.code,
-      period: classCreated.period,
-      createdAt: classCreated.createdAt,
-      updatedAt: classCreated.updatedAt,
-    };
+    return classCreated;
   }
 
   @Get()
@@ -61,14 +54,7 @@ export class ClassesController {
   async findAll() {
     const classes = await this.listClassesUseCase.execute();
 
-    return classes.map((classItem) => ({
-      id: classItem.id,
-      name: classItem.name,
-      code: classItem.code,
-      period: classItem.period,
-      createdAt: classItem.createdAt,
-      updatedAt: classItem.updatedAt,
-    }));
+    return classes;
   }
 
   @Get('active')
@@ -76,14 +62,7 @@ export class ClassesController {
   async findAllActive() {
     const classes = await this.listActiveClassesUseCase.execute();
 
-    return classes.map((classItem) => ({
-      id: classItem.id,
-      name: classItem.name,
-      code: classItem.code,
-      period: classItem.period,
-      createdAt: classItem.createdAt,
-      updatedAt: classItem.updatedAt,
-    }));
+    return classes;
   }
 
   @Get('my-classes')
@@ -102,19 +81,12 @@ export class ClassesController {
     return classes;
   }
 
-  @Get(':id')
+  @Get('my-classes/:id')
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     const classFound = await this.getClassUseCase.execute(id);
 
-    return {
-      id: classFound.id,
-      name: classFound.name,
-      code: classFound.code,
-      period: classFound.period,
-      createdAt: classFound.createdAt,
-      updatedAt: classFound.updatedAt,
-    };
+    return classFound;
   }
 
   @Patch(':id')
@@ -138,16 +110,6 @@ export class ClassesController {
   async remove(@Param('id') id: string) {
     const deletedClass = await this.deleteClassUseCase.execute(id);
 
-    return {
-      message: 'Classe excluída com sucesso',
-      data: {
-        id: deletedClass.id,
-        name: deletedClass.name,
-        code: deletedClass.code,
-        period: deletedClass.period,
-        createdAt: deletedClass.createdAt,
-        updatedAt: deletedClass.updatedAt,
-      },
-    };
+    return deletedClass;
   }
 }

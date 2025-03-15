@@ -46,15 +46,7 @@ export class StudentsController {
       teacherId: currentUser.sub,
     });
 
-    return {
-      id: studentCreated.id,
-      name: studentCreated.name,
-      email: studentCreated.email,
-      registration: studentCreated.registration,
-      classId: studentCreated.classId,
-      createdAt: studentCreated.createdAt,
-      updatedAt: studentCreated.updatedAt,
-    };
+    return studentCreated;
   }
 
   @Get(':classId')
@@ -68,15 +60,7 @@ export class StudentsController {
       currentUser.sub,
     );
 
-    return students.map((student) => ({
-      id: student.id,
-      name: student.name,
-      email: student.email,
-      registration: student.registration,
-      classId: student.classId,
-      createdAt: student.createdAt,
-      updatedAt: student.updatedAt,
-    }));
+    return students;
   }
 
   @Get(':id')
@@ -86,15 +70,7 @@ export class StudentsController {
   ) {
     const student = await this.getStudentUseCase.execute(id);
 
-    return {
-      id: student.id,
-      name: student.name,
-      email: student.email,
-      registration: student.registration,
-      classId: student.classId,
-      createdAt: student.createdAt,
-      updatedAt: student.updatedAt,
-    };
+    return student;
   }
 
   @Patch(':id')
@@ -110,15 +86,7 @@ export class StudentsController {
       currentUser.sub,
     );
 
-    return {
-      id: updatedStudent.id,
-      name: updatedStudent.name,
-      email: updatedStudent.email,
-      registration: updatedStudent.registration,
-      classId: updatedStudent.classId,
-      createdAt: updatedStudent.createdAt,
-      updatedAt: updatedStudent.updatedAt,
-    };
+    return updatedStudent;
   }
 
   @Delete(':id')
@@ -127,8 +95,8 @@ export class StudentsController {
   @Param('id') id: string,
     @CurrentUser() currentUser: IJwtPayload,
   ) {
-    await this.deleteStudentUseCase.execute(id, currentUser.sub);
+    const deletedStudent = await this.deleteStudentUseCase.execute(id, currentUser.sub);
 
-    return { message: 'Estudante excluído com sucesso' };
+    return deletedStudent;
   }
 }
