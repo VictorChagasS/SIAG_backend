@@ -48,7 +48,7 @@ model Class {
   name      String
   code      String?   // Código da turma
   period    String   // Período no formato "year.period" (ex: "2025.2")
-  teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id])
+  teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId String
   averageFormula String?  // Fórmula personalizada para cálculo da média da turma
   createdAt DateTime @default(now())
@@ -70,7 +70,7 @@ model Student {
   name        String
   email       String?
   registration String   // Matrícula ou identificação do estudante
-  class       Class    @relation(fields: [classId], references: [id])
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
   classId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
