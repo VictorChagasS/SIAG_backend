@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum para o tipo de fórmula de cálculo de média
+enum TypeFormula {
+  simple
+  personalized
+}
+
 model User {
   id            String     @id @default(uuid())
   name          String
@@ -50,6 +56,7 @@ model Class {
   period    String   // Período no formato "year.period" (ex: "2025.2")
   teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId String
+  typeFormula TypeFormula @default(simple) // Tipo de fórmula: simples ou personalizada
   averageFormula String?  // Fórmula personalizada para cálculo da média da turma
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,6 +97,7 @@ model Unit {
   name          String
   class         Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
   classId       String
+  typeFormula   TypeFormula @default(simple) // Tipo de fórmula: simples ou personalizada
   averageFormula String?   // Fórmula personalizada para cálculo da média da unidade
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

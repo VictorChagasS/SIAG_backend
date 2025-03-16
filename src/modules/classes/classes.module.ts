@@ -16,11 +16,13 @@ import { UpdateClassUseCase } from '@/modules/classes/domain/usecases/update-cla
 import { ClassesController } from '@/modules/classes/presentation/controllers/classes.controller';
 import { ImportClassWithStudentsController } from '@/modules/classes/presentation/controllers/import-class-with-students.controller';
 import { StudentsModule } from '@/modules/students/students.module';
+import { UnitsModule } from '@/modules/units/units.module';
 
 @Module({
   imports: [
     forwardRef(() => AuthModule),
     forwardRef(() => StudentsModule),
+    forwardRef(() => UnitsModule),
     MulterModule.register({
       limits: {
         fileSize: 5 * 1024 * 1024, // 5MB

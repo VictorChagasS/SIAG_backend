@@ -20,29 +20,53 @@ export class PrismaClassRepository implements IClassRepository {
 
     return {
       ...createdClass,
+      studentCount: 0, // Nova turma, sem estudantes
     };
   }
 
   async findById(id: string): Promise<Class | null> {
     const classFound = await this.prisma.class.findUnique({
       where: { id },
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
     if (!classFound) return null;
 
+    // eslint-disable-next-line no-underscore-dangle
+    const { _count, ...classData } = classFound;
+
     return {
-      ...classFound,
+      ...classData,
+      // eslint-disable-next-line no-underscore-dangle
+      studentCount: _count.students,
     };
   }
 
   async findByTeacherId(teacherId: string): Promise<Class[]> {
     const classes = await this.prisma.class.findMany({
       where: { teacherId },
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
-    return classes.map((classItem) => ({
-      ...classItem,
-    }));
+    return classes.map((classItem) => {
+      // eslint-disable-next-line no-underscore-dangle
+      const { _count, ...classData } = classItem;
+      return {
+        ...classData,
+        // eslint-disable-next-line no-underscore-dangle
+        studentCount: _count.students,
+      };
+    });
   }
 
   async findActiveByTeacherId(teacherId: string): Promise<Class[]> {
@@ -56,19 +80,44 @@ export class PrismaClassRepository implements IClassRepository {
         teacherId,
         period: user?.currentPeriod,
       },
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
-    return classes.map((classItem) => ({
-      ...classItem,
-    }));
+    return classes.map((classItem) => {
+      // eslint-disable-next-line no-underscore-dangle
+      const { _count, ...classData } = classItem;
+      return {
+        ...classData,
+        // eslint-disable-next-line no-underscore-dangle
+        studentCount: _count.students,
+      };
+    });
   }
 
   async findAll(): Promise<Class[]> {
-    const classes = await this.prisma.class.findMany();
+    const classes = await this.prisma.class.findMany({
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
+    });
 
-    return classes.map((classItem) => ({
-      ...classItem,
-    }));
+    return classes.map((classItem) => {
+      // eslint-disable-next-line no-underscore-dangle
+      const { _count, ...classData } = classItem;
+      return {
+        ...classData,
+        // eslint-disable-next-line no-underscore-dangle
+        studentCount: _count.students,
+      };
+    });
   }
 
   async findAllActive(): Promise<Class[]> {
@@ -81,23 +130,46 @@ export class PrismaClassRepository implements IClassRepository {
       where: {
         period: admin?.currentPeriod,
       },
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
-    return classes.map((classItem) => ({
-      ...classItem,
-    }));
+    return classes.map((classItem) => {
+      // eslint-disable-next-line no-underscore-dangle
+      const { _count, ...classData } = classItem;
+      return {
+        ...classData,
+        // eslint-disable-next-line no-underscore-dangle
+        studentCount: _count.students,
+      };
+    });
   }
 
   async update(id: string, classData: Partial<Class>): Promise<Class> {
-    const { teacherId, ...updateData } = classData;
+    const { teacherId, studentCount, ...updateData } = classData;
 
     const updatedClass = await this.prisma.class.update({
       where: { id },
       data: updateData,
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
+    // eslint-disable-next-line no-underscore-dangle
+    const { _count, ...updatedClassData } = updatedClass;
+
     return {
-      ...updatedClass,
+      ...updatedClassData,
+      // eslint-disable-next-line no-underscore-dangle
+      studentCount: _count.students,
     };
   }
 
@@ -113,12 +185,23 @@ export class PrismaClassRepository implements IClassRepository {
         name,
         period,
       },
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
     if (!classFound) return null;
 
+    // eslint-disable-next-line no-underscore-dangle
+    const { _count, ...classData } = classFound;
+
     return {
-      ...classFound,
+      ...classData,
+      // eslint-disable-next-line no-underscore-dangle
+      studentCount: _count.students,
     };
   }
 
@@ -129,12 +212,23 @@ export class PrismaClassRepository implements IClassRepository {
         period,
         teacherId,
       },
+      include: {
+        // eslint-disable-next-line no-underscore-dangle
+        _count: {
+          select: { students: true },
+        },
+      },
     });
 
     if (!classFound) return null;
 
+    // eslint-disable-next-line no-underscore-dangle
+    const { _count, ...classData } = classFound;
+
     return {
-      ...classFound,
+      ...classData,
+      // eslint-disable-next-line no-underscore-dangle
+      studentCount: _count.students,
     };
   }
 }

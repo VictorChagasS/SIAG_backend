@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
+
+import { AuthModule } from '@/modules/auth/auth.module';
+import { ClassesModule } from '@/modules/classes/classes.module';
+import { UnitsModule } from '@/modules/units/units.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 import { CreateEvaluationItemUseCase } from './domain/usecases/create-evaluation-item.usecase';
 import { DeleteEvaluationItemUseCase } from './domain/usecases/delete-evaluation-item.usecase';
@@ -9,13 +14,13 @@ import { EVALUATION_ITEM_REPOSITORY } from './evaluation-items.providers';
 import { PrismaEvaluationItemRepository } from './infra/prisma/repositories/prisma-evaluation-item.repository';
 import { EvaluationItemsController } from './presentation/controllers/evaluation-items.controller';
 
-import { AuthModule } from '@/modules/auth/auth.module';
-import { ClassesModule } from '@/modules/classes/classes.module';
-import { UnitsModule } from '@/modules/units/units.module';
-import { PrismaModule } from '@/prisma/prisma.module';
-
 @Module({
-  imports: [PrismaModule, ClassesModule, UnitsModule, AuthModule],
+  imports: [
+    PrismaModule,
+    forwardRef(() => ClassesModule),
+    forwardRef(() => UnitsModule),
+    AuthModule,
+  ],
   controllers: [EvaluationItemsController],
   providers: [
     {

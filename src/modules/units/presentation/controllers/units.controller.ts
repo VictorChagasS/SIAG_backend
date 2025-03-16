@@ -2,6 +2,10 @@ import {
   Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards,
 } from '@nestjs/common';
 
+import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
+import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
+import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
+
 import { CreateUnitUseCase } from '../../domain/usecases/create-unit.usecase';
 import { DeleteUnitUseCase } from '../../domain/usecases/delete-unit.usecase';
 import { GetUnitUseCase } from '../../domain/usecases/get-unit.usecase';
@@ -13,10 +17,6 @@ import { CreateUnitDto } from '../dtos/create-unit.dto';
 import { UpdateUnitFormulaDto } from '../dtos/update-unit-formula.dto';
 import { UpdateUnitDto } from '../dtos/update-unit.dto';
 import { UpsertUnitDto } from '../dtos/upsert-unit.dto';
-
-import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
-import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 
 @Controller('units')
 export class UnitsController {
@@ -107,7 +107,7 @@ export class UnitsController {
     return updatedUnit;
   }
 
-  @Patch('/:id/formula')
+  @Patch(':classId/:id/formula')
   @UseGuards(JwtAuthGuard)
   async updateFormula(
   @Param('classId') classId: string,
@@ -117,7 +117,7 @@ export class UnitsController {
   ) {
     const updatedUnit = await this.updateUnitFormulaUseCase.execute(
       id,
-      updateUnitFormulaDto.formula,
+      updateUnitFormulaDto,
       currentUser.sub,
     );
 

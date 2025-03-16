@@ -117,7 +117,7 @@ export class ClassesController {
   ) {
     const classUpdated = await this.updateClassFormulaUseCase.execute(
       id,
-      updateClassFormulaDto.formula,
+      updateClassFormulaDto,
       currentUser.sub,
     );
 

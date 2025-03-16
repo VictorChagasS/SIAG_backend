@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
+
+import { AuthModule } from '@/modules/auth/auth.module';
+import { ClassesModule } from '@/modules/classes/classes.module';
+import { EvaluationItemsModule } from '@/modules/evaluation-items/evaluation-items.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 import { CreateUnitUseCase } from './domain/usecases/create-unit.usecase';
 import { DeleteUnitUseCase } from './domain/usecases/delete-unit.usecase';
@@ -11,12 +16,13 @@ import { PrismaUnitRepository } from './infra/prisma/repositories/prisma-unit.re
 import { UnitsController } from './presentation/controllers/units.controller';
 import { UNIT_REPOSITORY } from './units.providers';
 
-import { AuthModule } from '@/modules/auth/auth.module';
-import { ClassesModule } from '@/modules/classes/classes.module';
-import { PrismaModule } from '@/prisma/prisma.module';
-
 @Module({
-  imports: [PrismaModule, ClassesModule, AuthModule],
+  imports: [
+    PrismaModule,
+    forwardRef(() => ClassesModule),
+    forwardRef(() => EvaluationItemsModule),
+    AuthModule,
+  ],
   controllers: [UnitsController],
   providers: [
     {

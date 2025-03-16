@@ -32,7 +32,7 @@ export class PrismaEvaluationItemRepository implements IEvaluationItemRepository
   async findByUnitId(unitId: string): Promise<EvaluationItem[]> {
     const evaluationItems = await this.prisma.evaluationItem.findMany({
       where: { unitId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
     });
 
     return evaluationItems;

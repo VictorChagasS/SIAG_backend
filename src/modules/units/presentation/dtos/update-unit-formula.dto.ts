@@ -1,7 +1,15 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEnum, IsNotEmpty, IsOptional, IsString,
+} from 'class-validator';
+
+import { ITypeFormula } from '@/modules/classes/domain/entities/class.entity';
 
 export class UpdateUnitFormulaDto {
-  @IsNotEmpty({ message: 'A fórmula de cálculo é obrigatória' })
+  @IsOptional()
   @IsString({ message: 'A fórmula deve ser uma string' })
-    formula: string;
+    formula?: string;
+
+  @IsNotEmpty({ message: 'O tipo de fórmula é obrigatório' })
+  @IsEnum(['simple', 'personalized'], { message: 'O tipo de fórmula deve ser "simple" ou "personalized"' })
+    typeFormula: ITypeFormula;
 }

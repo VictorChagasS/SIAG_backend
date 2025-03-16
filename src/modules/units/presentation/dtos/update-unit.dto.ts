@@ -2,6 +2,10 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateUnitDto {
   @IsOptional()
+  @IsString({ message: 'O ID deve ser uma string' })
+    id?: string;
+
+  @IsOptional()
   @IsString({ message: 'O nome deve ser uma string' })
     name?: string;
 
