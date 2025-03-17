@@ -2,9 +2,6 @@ import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 
-import { GRADE_REPOSITORY } from '../../grades.providers';
-import { IGradeRepository } from '../repositories/grade-repository.interface';
-
 import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 import { IEvaluationItemRepository } from '@/modules/evaluation-items/domain/repositories/evaluation-item-repository.interface';
@@ -13,6 +10,9 @@ import { IStudentRepository } from '@/modules/students/domain/repositories/stude
 import { STUDENT_REPOSITORY } from '@/modules/students/students.providers';
 import { IUnitRepository } from '@/modules/units/domain/repositories/unit-repository.interface';
 import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
+
+import { GRADE_REPOSITORY } from '../../grades.providers';
+import { IGradeRepository } from '../repositories/grade-repository.interface';
 
 interface IUnitAverageResult {
   unitId: string;
@@ -122,7 +122,7 @@ export class CalculateStudentAverageUseCase {
             // eslint-disable-next-line no-eval
             unitAverage = eval(formulaWithValues);
           } catch (error) {
-            throw new Error(`Erro ao calcular a média personalizada para o estudante ${student.name} na unidade ${unit.name}: ${error.message}`);
+            throw new Error(`Erro ao calcular a média personalizada para o estudante ${student.name} na unidade ${unit.name}: ${error.message} Verifique a fórmula da unidade`);
           }
         }
 
@@ -165,7 +165,7 @@ export class CalculateStudentAverageUseCase {
           // eslint-disable-next-line no-eval
           studentAverage = eval(formulaWithValues);
         } catch (error) {
-          throw new Error(`Erro ao calcular a média personalizada para o estudante ${student.name}: ${error.message}`);
+          throw new Error(`Erro ao calcular a média personalizada para o estudante ${student.name}: ${error.message} Verifique a fórmula da classe`);
         }
       }
 
