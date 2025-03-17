@@ -2,9 +2,6 @@ import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 
-import { GRADE_REPOSITORY } from '../../grades.providers';
-import { IGradeRepository } from '../repositories/grade-repository.interface';
-
 import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 import { IEvaluationItemRepository } from '@/modules/evaluation-items/domain/repositories/evaluation-item-repository.interface';
@@ -13,6 +10,9 @@ import { IStudentRepository } from '@/modules/students/domain/repositories/stude
 import { STUDENT_REPOSITORY } from '@/modules/students/students.providers';
 import { IUnitRepository } from '@/modules/units/domain/repositories/unit-repository.interface';
 import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
+
+import { GRADE_REPOSITORY } from '../../grades.providers';
+import { IGradeRepository } from '../repositories/grade-repository.interface';
 
 interface IUnitAverageResult {
   studentId: string;
@@ -114,12 +114,19 @@ export class CalculateUnitAverageUseCase {
       try {
         // Preparar as variáveis para a fórmula personalizada
         const variables = {};
-        evaluationItems.forEach((item) => {
+
+        // Mapear os itens avaliativos para as variáveis na fórmula
+        // Assumindo que os itens avaliativos estão ordenados e correspondem a N1, N2, etc.
+        evaluationItems.forEach((item, index) => {
           const grade = grades.find((g) => g.evaluationItemId === item.id);
-          // Usar o nome do item avaliativo como variável na fórmula
-          // Substituir espaços por underscores para evitar problemas na fórmula
+
+          // Criar duas variáveis para cada item: uma com o nome original e outra com Nx
           const varName = item.name.replace(/\s+/g, '_').toLowerCase();
-          variables[varName] = grade ? grade.value : 0;
+          const formulaVarName = `N${index + 1}`;
+
+          const value = grade ? grade.value : 0;
+          variables[varName] = value;
+          variables[formulaVarName] = value;
         });
 
         // Avaliar a fórmula personalizada
@@ -134,6 +141,10 @@ export class CalculateUnitAverageUseCase {
           const regex = new RegExp(name, 'g');
           formulaWithValues = formulaWithValues.replace(regex, value.toString());
         });
+
+        console.log('Fórmula original:', formula);
+        console.log('Fórmula com valores:', formulaWithValues);
+        console.log('Variáveis:', variables);
 
         // Avaliar a fórmula
         // eslint-disable-next-line no-eval

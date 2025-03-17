@@ -1,9 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
 
 import { AuthModule } from '@/modules/auth/auth.module';
+import { ClassesModule } from '@/modules/classes/classes.module';
+import { GradesModule } from '@/modules/grades/grades.module';
 import { PrismaModule } from '@/prisma/prisma.module';
-
-import { ClassesModule } from '../classes/classes.module';
 
 import { CreateStudentUseCase } from './domain/usecases/create-student.usecase';
 import { DeleteStudentUseCase } from './domain/usecases/delete-student.usecase';
@@ -18,6 +18,7 @@ import { STUDENT_REPOSITORY } from './students.providers';
   imports: [
     PrismaModule,
     forwardRef(() => ClassesModule),
+    forwardRef(() => GradesModule),
     AuthModule,
   ],
   controllers: [StudentsController],

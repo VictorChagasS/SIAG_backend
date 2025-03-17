@@ -34,6 +34,9 @@ export class PrismaStudentRepository implements IStudentRepository {
   async findByClassId(classId: string): Promise<Student[]> {
     const students = await this.prisma.student.findMany({
       where: { classId },
+      orderBy: {
+        name: 'asc',
+      },
     });
 
     return students;

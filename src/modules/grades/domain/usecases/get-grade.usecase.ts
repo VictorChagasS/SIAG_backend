@@ -2,16 +2,16 @@ import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 
-import { GRADE_REPOSITORY } from '../../grades.providers';
-import { Grade } from '../entities/grade.entity';
-import { IGradeRepository } from '../repositories/grade-repository.interface';
-
 import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 import { IEvaluationItemRepository } from '@/modules/evaluation-items/domain/repositories/evaluation-item-repository.interface';
 import { EVALUATION_ITEM_REPOSITORY } from '@/modules/evaluation-items/evaluation-items.providers';
 import { IUnitRepository } from '@/modules/units/domain/repositories/unit-repository.interface';
 import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
+
+import { GRADE_REPOSITORY } from '../../grades.providers';
+import { Grade } from '../entities/grade.entity';
+import { IGradeRepository } from '../repositories/grade-repository.interface';
 
 @Injectable()
 export class GetGradeUseCase {

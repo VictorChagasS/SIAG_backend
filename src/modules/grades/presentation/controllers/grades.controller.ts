@@ -2,6 +2,11 @@ import {
   Body, Controller, Get, Param, Post, Put, UseGuards,
 } from '@nestjs/common';
 
+import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
+import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
+import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
+
+import { CalculateAllAveragesUseCase } from '../../domain/usecases/calculate-all-averages.usecase';
 import { CalculateClassAverageUseCase } from '../../domain/usecases/calculate-class-average.usecase';
 import { CalculateUnitAverageUseCase } from '../../domain/usecases/calculate-unit-average.usecase';
 import { CreateGradeUseCase } from '../../domain/usecases/create-grade.usecase';
@@ -13,10 +18,6 @@ import { UpdateGradeUseCase } from '../../domain/usecases/update-grade.usecase';
 import { CreateGradeDto } from '../dtos/create-grade.dto';
 import { UpdateGradeDto } from '../dtos/update-grade.dto';
 import { UpsertStudentGradesDto } from '../dtos/upsert-student-grades.dto';
-
-import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
-import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 
 // Interfaces para os tipos de retorno
 interface IUnitAverageResult {
@@ -48,6 +49,21 @@ interface IClassAverageResult {
   }>;
 }
 
+interface IAllAveragesResult {
+  classId: string;
+  className: string;
+  studentAverages: Array<{
+    studentId: string;
+    studentName: string;
+    average: number;
+    unitAverages: Array<{
+      unitId: string;
+      unitName: string;
+      average: number;
+    }>;
+  }>;
+}
+
 @Controller('grades')
 export class GradesController {
   constructor(
@@ -59,6 +75,7 @@ export class GradesController {
     private getStudentGradesByUnitUseCase: GetStudentGradesByUnitUseCase,
     private calculateUnitAverageUseCase: CalculateUnitAverageUseCase,
     private calculateClassAverageUseCase: CalculateClassAverageUseCase,
+    private calculateAllAveragesUseCase: CalculateAllAveragesUseCase,
   ) {}
 
   @Post()
@@ -172,5 +189,18 @@ export class GradesController {
       currentUser.sub,
     );
     return average as IClassAverageResult;
+  }
+
+  @Get('class/:classId/all-averages')
+  @UseGuards(JwtAuthGuard)
+  async calculateAllAverages(
+    @Param('classId') classId: string,
+      @CurrentUser() currentUser: IJwtPayload,
+  ): Promise<IAllAveragesResult> {
+    const allAverages = await this.calculateAllAveragesUseCase.execute(
+      currentUser.sub,
+      classId,
+    );
+    return allAverages as IAllAveragesResult;
   }
 }
