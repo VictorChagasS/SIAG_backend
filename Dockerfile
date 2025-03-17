@@ -26,6 +26,12 @@ COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/prisma ./prisma
 COPY --from=development /usr/src/app/src/scripts ./src/scripts
 
+# Gerando o Prisma Client
+RUN npx prisma generate
+
+# Executando as migrações
+RUN npx prisma migrate deploy
+
 EXPOSE 3000
 
 CMD ["node", "dist/main"] 
