@@ -9,6 +9,7 @@ import { IClassRepository } from '../repositories/class-repository.interface';
 export interface IUpdateClassDTO {
   name?: string;
   period?: string;
+  section?: number;
 }
 
 @Injectable()
@@ -35,12 +36,14 @@ export class UpdateClassUseCase {
       // Buscar os valores atuais para os campos que não estão sendo atualizados
       const name = data.name || classExists.name;
       const period = data.period || classExists.period;
+      const section = data.section || classExists.section;
 
       // Verificar se já existe outra turma com a mesma combinação de nome e período para este professor
       const existingClass = await this.classRepository.findByNamePeriodAndTeacher(
         name,
         period,
         teacherId,
+        section,
       );
 
       // Se existir uma turma com essa combinação e não for a mesma que estamos atualizando

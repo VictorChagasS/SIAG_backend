@@ -9,6 +9,7 @@ export interface ICreateClassDTO {
   code: string;
   period: string;
   teacherId: string;
+  section?: number;
 }
 
 @Injectable()
@@ -24,6 +25,7 @@ export class CreateClassUseCase {
       data.name,
       data.period,
       data.teacherId,
+      data.section,
     );
 
     if (existingClass) {
@@ -36,6 +38,7 @@ export class CreateClassUseCase {
       name: data.name,
       code: data.code,
       period: data.period,
+      section: data.section,
       teacherId: data.teacherId,
     });
 

@@ -1,5 +1,5 @@
 import {
-  IsOptional, IsString, Matches,
+  IsOptional, IsString, Matches, IsInt, IsPositive,
 } from 'class-validator';
 
 export class UpdateClassDto {
@@ -10,6 +10,11 @@ export class UpdateClassDto {
   @IsString()
   @IsOptional()
     code?: string;
+
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+    section?: number;
 
   @IsString()
   @IsOptional()

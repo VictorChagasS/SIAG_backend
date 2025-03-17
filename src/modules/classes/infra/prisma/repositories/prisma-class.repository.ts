@@ -15,6 +15,7 @@ export class PrismaClassRepository implements IClassRepository {
         period: classData.period,
         teacherId: classData.teacherId,
         code: classData?.code,
+        section: classData?.section || 1,
       },
     });
 
@@ -205,12 +206,13 @@ export class PrismaClassRepository implements IClassRepository {
     };
   }
 
-  async findByNamePeriodAndTeacher(name: string, period: string, teacherId: string): Promise<Class | null> {
+  async findByNamePeriodAndTeacher(name: string, period: string, teacherId: string, section: number): Promise<Class | null> {
     const classFound = await this.prisma.class.findFirst({
       where: {
         name,
         period,
         teacherId,
+        section,
       },
       include: {
         // eslint-disable-next-line no-underscore-dangle

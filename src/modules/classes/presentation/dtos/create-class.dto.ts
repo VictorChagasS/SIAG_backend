@@ -1,5 +1,5 @@
 import {
-  IsNotEmpty, IsOptional, IsString, Matches,
+  IsNotEmpty, IsOptional, IsString, Matches, IsInt, IsPositive,
 } from 'class-validator';
 
 export class CreateClassDto {
@@ -10,6 +10,11 @@ export class CreateClassDto {
   @IsString()
   @IsOptional()
     code?: string;
+
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+    section?: number;
 
   @IsString()
   @IsNotEmpty()

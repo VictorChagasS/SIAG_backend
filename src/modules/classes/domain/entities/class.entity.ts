@@ -7,6 +7,8 @@ export class Class {
 
   code?: string;
 
+  section?: number; // Número da turma, por padrão é 1
+
   period: string; // Formato: "year.period" (ex: "2025.2")
 
   teacherId: string;
@@ -21,7 +23,7 @@ export class Class {
 
   updatedAt?: Date;
 
-  constructor(props: Omit<Class, 'createdAt' | 'updatedAt' | 'studentCount' | 'typeFormula'>) {
+  constructor(props: Omit<Class, 'createdAt' | 'updatedAt' | 'studentCount' | 'typeFormula'> & { section?: number }) {
     Object.assign(this, props);
 
     // Se averageFormula estiver definido, definir typeFormula como 'personalized', caso contrário como 'simple'
@@ -29,6 +31,13 @@ export class Class {
       this.typeFormula = 'personalized';
     } else {
       this.typeFormula = 'simple';
+    }
+
+    // Define o valor padrão para section se não for fornecido
+    if (props.section === undefined) {
+      this.section = 1;
+    } else {
+      this.section = props.section;
     }
   }
 }

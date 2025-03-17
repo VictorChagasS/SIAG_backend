@@ -9,5 +9,5 @@ export interface IClassRepository {
   findAllActive(): Promise<Class[]>;
   update(id: string, classData: Partial<Class>): Promise<Class>;
   delete(id: string): Promise<void>;
-  findByNamePeriodAndTeacher(name: string, period: string, teacherId: string): Promise<Class | null>;
+  findByNamePeriodAndTeacher(name: string, period: string, teacherId: string, section?: number): Promise<Class | null>;
 }

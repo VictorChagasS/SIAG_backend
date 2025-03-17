@@ -139,18 +139,13 @@ export class CalculateUnitAverageUseCase {
         // Substituir as variáveis pelos valores
         Object.entries(variables).forEach(([name, value]) => {
           const regex = new RegExp(name, 'g');
-          formulaWithValues = formulaWithValues.replace(regex, value.toString());
+          formulaWithValues = formulaWithValues.replace(regex, value.toString() || '0');
         });
-
-        console.log('Fórmula original:', formula);
-        console.log('Fórmula com valores:', formulaWithValues);
-        console.log('Variáveis:', variables);
-
         // Avaliar a fórmula
         // eslint-disable-next-line no-eval
         average = eval(formulaWithValues);
       } catch (error) {
-        throw new Error(`Erro ao calcular a média personalizada: ${error.message}`);
+        throw new Error(`Erro ao calcular a média personalizada: ${error.message} Verifique a fórmula da unidade`);
       }
     }
 
