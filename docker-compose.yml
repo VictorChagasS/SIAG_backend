@@ -39,8 +39,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     command: >
-      sh -c "npm run prisma:generate &&
-             npm run import:universities &&
+      sh -c "npm run import:universities &&
              npm run start:dev"
     networks:
       - siag-network
