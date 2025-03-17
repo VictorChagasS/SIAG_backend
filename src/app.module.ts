@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { ClassesModule } from '@/modules/classes/classes.module';
 import { EvaluationItemsModule } from '@/modules/evaluation-items/evaluation-items.module';
+import { GradesModule } from '@/modules/grades/grades.module';
 import { InstitutionsModule } from '@/modules/institutions/institutions.module';
 import { StudentsModule } from '@/modules/students/students.module';
 import { UnitsModule } from '@/modules/units/units.module';
@@ -23,6 +24,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
     StudentsModule,
     UnitsModule,
     EvaluationItemsModule,
+    GradesModule,
   ],
 })
 export class AppModule {}
