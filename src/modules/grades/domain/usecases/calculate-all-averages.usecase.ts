@@ -18,6 +18,7 @@ interface IUnitAverageResult {
 interface IStudentAverageResult {
   studentId: string;
   studentName: string;
+  studentRegistration: string;
   average: number;
   unitAverages: IUnitAverageResult[];
 }
@@ -74,6 +75,7 @@ export class CalculateAllAveragesUseCase {
         return {
           studentId: student.id,
           studentName: student.name,
+          studentRegistration: student.registration,
           average: average.average,
           unitAverages: average.unitAverages,
         };

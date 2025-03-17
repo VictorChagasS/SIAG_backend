@@ -31,14 +31,14 @@ export class UpdateClassUseCase {
       throw new ForbiddenException('Você não tem permissão para atualizar esta turma');
     }
 
-    // Verificar se estamos atualizando nome ou período
-    if (data.name || data.period) {
+    // Verificar se estamos atualizando nome, período ou seção
+    if (data.name || data.period || data.section) {
       // Buscar os valores atuais para os campos que não estão sendo atualizados
       const name = data.name || classExists.name;
       const period = data.period || classExists.period;
       const section = data.section || classExists.section;
 
-      // Verificar se já existe outra turma com a mesma combinação de nome e período para este professor
+      // Verificar se já existe outra turma com a mesma combinação de nome, período e seção para este professor
       const existingClass = await this.classRepository.findByNamePeriodAndTeacher(
         name,
         period,
@@ -49,7 +49,7 @@ export class UpdateClassUseCase {
       // Se existir uma turma com essa combinação e não for a mesma que estamos atualizando
       if (existingClass && existingClass.id !== id) {
         throw new ConflictException(
-          'Você já possui uma turma com este nome neste período',
+          'Você já possui uma turma com este nome e número neste período',
         );
       }
     }

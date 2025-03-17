@@ -1,6 +1,7 @@
 import {
-  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,
+  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 
 import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
 import { AdminGuard } from '@/modules/auth/domain/guards/admin.guard';
@@ -8,6 +9,7 @@ import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
 import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 import { CreateClassUseCase } from '@/modules/classes/domain/usecases/create-class.usecase';
 import { DeleteClassUseCase } from '@/modules/classes/domain/usecases/delete-class.usecase';
+import { ExportClassTemplateUseCase } from '@/modules/classes/domain/usecases/export-class-template.usecase';
 import { GetClassUseCase } from '@/modules/classes/domain/usecases/get-class.usecase';
 import { ListActiveClassesUseCase } from '@/modules/classes/domain/usecases/list-active-classes.usecase';
 import { ListActiveTeacherClassesUseCase } from '@/modules/classes/domain/usecases/list-active-teacher-classes.usecase';
@@ -31,7 +33,38 @@ export class ClassesController {
     private readonly updateClassUseCase: UpdateClassUseCase,
     private readonly updateClassFormulaUseCase: UpdateClassFormulaUseCase,
     private readonly deleteClassUseCase: DeleteClassUseCase,
+    private readonly exportClassTemplateUseCase: ExportClassTemplateUseCase,
   ) {}
+
+  @Get(':id/export')
+  @UseGuards(JwtAuthGuard)
+  async exportTemplate(
+  @Param('id') id: string,
+    @CurrentUser() currentUser: IJwtPayload,
+    @Res() res: Response,
+  ) {
+    const templateBuffer = await this.exportClassTemplateUseCase.execute(id, currentUser.sub);
+
+    // Obter a turma para usar no nome do arquivo
+    const classEntity = await this.getClassUseCase.execute(id);
+
+    // Formatar o nome do arquivo: nome_turma-turma-codigo-periodo.xlsx
+    // Substituindo espaços por _ e removendo caracteres especiais
+    const classNameSafe = classEntity.name.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+    const classSectionSafe = classEntity.section || 1;
+    const classCodeSafe = (classEntity.code || '').replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+    const classPeriodSafe = classEntity.period.replace(/\./g, '_');
+
+    const fileName = `${classNameSafe}-${classCodeSafe}-${classPeriodSafe}-${classSectionSafe}.xlsx`;
+
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Content-Length': templateBuffer.length,
+    });
+
+    res.end(templateBuffer);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)

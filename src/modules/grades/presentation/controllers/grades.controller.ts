@@ -178,6 +178,7 @@ export class GradesController {
     return average as IUnitAverageResult;
   }
 
+  // Remove it
   @Get('class/:classId/average')
   @UseGuards(JwtAuthGuard)
   async calculateClassAverage(
@@ -188,7 +189,7 @@ export class GradesController {
       classId,
       currentUser.sub,
     );
-    return average as IClassAverageResult;
+    return average as unknown as IClassAverageResult;
   }
 
   @Get('class/:classId/all-averages')

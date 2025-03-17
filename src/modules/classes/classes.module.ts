@@ -5,6 +5,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { classesProviders } from '@/modules/classes/classes.providers';
 import { CreateClassUseCase } from '@/modules/classes/domain/usecases/create-class.usecase';
 import { DeleteClassUseCase } from '@/modules/classes/domain/usecases/delete-class.usecase';
+import { ExportClassTemplateUseCase } from '@/modules/classes/domain/usecases/export-class-template.usecase';
 import { GetClassUseCase } from '@/modules/classes/domain/usecases/get-class.usecase';
 import { ImportClassWithStudentsUseCase } from '@/modules/classes/domain/usecases/import-class-with-students.usecase';
 import { ListActiveClassesUseCase } from '@/modules/classes/domain/usecases/list-active-classes.usecase';
@@ -15,6 +16,7 @@ import { UpdateClassFormulaUseCase } from '@/modules/classes/domain/usecases/upd
 import { UpdateClassUseCase } from '@/modules/classes/domain/usecases/update-class.usecase';
 import { ClassesController } from '@/modules/classes/presentation/controllers/classes.controller';
 import { ImportClassWithStudentsController } from '@/modules/classes/presentation/controllers/import-class-with-students.controller';
+import { GradesModule } from '@/modules/grades/grades.module';
 import { StudentsModule } from '@/modules/students/students.module';
 import { UnitsModule } from '@/modules/units/units.module';
 
@@ -23,6 +25,7 @@ import { UnitsModule } from '@/modules/units/units.module';
     forwardRef(() => AuthModule),
     forwardRef(() => StudentsModule),
     forwardRef(() => UnitsModule),
+    forwardRef(() => GradesModule),
     MulterModule.register({
       limits: {
         fileSize: 5 * 1024 * 1024, // 5MB
@@ -44,10 +47,17 @@ import { UnitsModule } from '@/modules/units/units.module';
     UpdateClassFormulaUseCase,
     DeleteClassUseCase,
     ImportClassWithStudentsUseCase,
+    ExportClassTemplateUseCase,
     ...classesProviders,
   ],
   exports: [
     ...classesProviders,
+    GetClassUseCase,
+    ListClassesUseCase,
+    ListActiveClassesUseCase,
+    ListTeacherClassesUseCase,
+    ListActiveTeacherClassesUseCase,
+    ExportClassTemplateUseCase,
   ],
 })
 export class ClassesModule {}

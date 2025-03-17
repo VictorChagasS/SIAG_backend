@@ -15,10 +15,10 @@ import { IGradeRepository } from '../repositories/grade-repository.interface';
 interface IClassAverageResult {
   classId: string;
   className: string;
-  average: number;
   studentAverages: Array<{
     studentId: string;
     studentName: string;
+    studentRegistration: string;
     average: number;
     unitAverages: Array<{
       unitId: string;
@@ -61,7 +61,6 @@ export class CalculateClassAverageUseCase {
       return {
         classId,
         className: classEntity.name,
-        average: 0,
         studentAverages: [],
       };
     }
@@ -72,7 +71,7 @@ export class CalculateClassAverageUseCase {
       return {
         classId,
         className: classEntity.name,
-        average: 0,
+
         studentAverages: [],
       };
     }
@@ -182,26 +181,16 @@ export class CalculateClassAverageUseCase {
         return {
           studentId: student.id,
           studentName: student.name,
+          studentRegistration: student.registration,
           average: studentAverage,
           unitAverages,
         };
       }),
     );
 
-    // Calcular a média geral da turma
-    let classAverage = 0;
-    if (studentAverages.length > 0) {
-      const sum = studentAverages.reduce((acc, student) => acc + student.average, 0);
-      classAverage = sum / studentAverages.length;
-    }
-
-    // Arredondar para 2 casas decimais
-    classAverage = Math.round(classAverage * 100) / 100;
-
     return {
       classId,
       className: classEntity.name,
-      average: classAverage,
       studentAverages,
     };
   }

@@ -47,6 +47,6 @@ import { GradesController } from './presentation/controllers/grades.controller';
     CalculateAllAveragesUseCase,
     CalculateStudentAverageUseCase,
   ],
-  exports: [GRADE_REPOSITORY, CalculateStudentAverageUseCase],
+  exports: [GRADE_REPOSITORY, CalculateStudentAverageUseCase, CalculateClassAverageUseCase, CalculateAllAveragesUseCase],
 })
 export class GradesModule {}

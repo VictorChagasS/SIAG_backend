@@ -8,6 +8,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  theme = "neutral"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -53,6 +58,7 @@ model Class {
   id        String   @id @default(uuid())
   name      String
   code      String?   // Código da turma
+  section   Int      @default(1)  // Número da turma, por padrão é 1
   period    String   // Período no formato "year.period" (ex: "2025.2")
   teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId String
@@ -67,6 +73,7 @@ model Class {
   @@index([teacherId])
   @@index([period])
   @@index([code])
+  @@index([section])
 
   @@map("classes")
 }
