@@ -9,6 +9,8 @@ jobs:
   build-and-push:
     name: Build Docker image and push to ECR
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Checkout repository
