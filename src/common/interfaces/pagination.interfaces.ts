@@ -1,5 +1,17 @@
 /**
- * Interface base para opções de paginação
+ * Pagination Interfaces
+ *
+ * Type definitions for pagination and search operations across the application.
+ * These interfaces provide consistent typing for pagination operations.
+ *
+ * @module CommonInterfaces
+ */
+
+/**
+ * Base interface for pagination options
+ *
+ * Contains the fundamental pagination parameters used
+ * for paginated data retrieval operations.
  */
 export interface IPaginationOptions {
   page?: number;
@@ -7,7 +19,12 @@ export interface IPaginationOptions {
 }
 
 /**
- * Interface para resultado paginado genérico
+ * Interface for generic paginated result
+ *
+ * Basic structure for paginated data with total count.
+ * Used in repositories and services for intermediate data representation.
+ *
+ * @template T Type of items in the data array
  */
 export interface IPaginatedResult<T> {
   data: T[];
@@ -15,7 +32,10 @@ export interface IPaginatedResult<T> {
 }
 
 /**
- * Interface para metadados de paginação
+ * Interface for pagination metadata
+ *
+ * Contains comprehensive pagination information including
+ * total count, current page, items per page, and derived total pages.
  */
 export interface IPaginationMeta {
   total: number;
@@ -25,7 +45,12 @@ export interface IPaginationMeta {
 }
 
 /**
- * Interface para resposta paginada completa com metadados
+ * Interface for complete paginated response with metadata
+ *
+ * Used for API responses to provide both the data array
+ * and detailed pagination metadata to clients.
+ *
+ * @template T Type of items in the data array
  */
 export interface IPaginatedResponse<T> {
   data: T[];
@@ -33,30 +58,42 @@ export interface IPaginatedResponse<T> {
 }
 
 /**
- * Interface para parâmetros de pesquisa por nome
+ * Interface for name-based search parameters
+ *
+ * Contains an optional name parameter for filtering results.
  */
 export interface INameSearchOptions {
   name?: string;
 }
 
 /**
- * Interface para parâmetros de pesquisa por período
+ * Interface for period-based search parameters
+ *
+ * Contains an optional period parameter for filtering results
+ * by academic period (typically in format YYYY.N).
  */
 export interface IPeriodSearchOptions {
   period?: string;
 }
 
 /**
- * Interface combinando paginação e pesquisa por nome
+ * Interface combining pagination and name search
+ *
+ * Used for operations that require both pagination and name filtering.
  */
 export interface IPaginationNameSearchOptions extends IPaginationOptions, INameSearchOptions {}
 
 /**
- * Interface combinando paginação e pesquisa por período
+ * Interface combining pagination and period search
+ *
+ * Used for operations that require both pagination and period filtering.
  */
 export interface IPaginationPeriodSearchOptions extends IPaginationOptions, IPeriodSearchOptions {}
 
 /**
- * Interface combinando paginação, pesquisa por nome e por período
+ * Interface combining pagination, name search, and period search
+ *
+ * Used for operations that require pagination with both name and period filtering.
+ * Common in academic management contexts.
  */
 export interface IPaginationNamePeriodSearchOptions extends IPaginationOptions, INameSearchOptions, IPeriodSearchOptions {}

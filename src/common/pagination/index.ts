@@ -1,5 +1,7 @@
 /**
- * Exportação centralizada de todos os componentes de paginação
+ * Centralized export of all pagination components
+ *
+ * @module Pagination
  */
 
 // Interfaces

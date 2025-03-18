@@ -1,3 +1,11 @@
+/**
+ * Authentication Controller
+ *
+ * Handles HTTP requests related to user authentication,
+ * including login and retrieving the current user's profile.
+ *
+ * @module AuthControllers
+ */
 import {
   Body,
   Controller,
@@ -25,14 +33,35 @@ import { UserMeResponseDto } from '../../domain/dtos/user-me-response.dto';
 import { AuthenticateUserUseCase } from '../../domain/usecases/authenticate-user.usecase';
 import { GetMeUseCase } from '../../domain/usecases/get-me.usecase';
 
+/**
+ * Controller for authentication endpoints
+ *
+ * Provides routes for user authentication and profile retrieval.
+ *
+ * @class AuthController
+ */
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
+  /**
+   * Creates an instance of AuthController
+   *
+   * @param {AuthenticateUserUseCase} authenticateUserUseCase - Use case for user authentication
+   * @param {GetMeUseCase} getMeUseCase - Use case for retrieving the current user's profile
+   */
   constructor(
     private readonly authenticateUserUseCase: AuthenticateUserUseCase,
     private readonly getMeUseCase: GetMeUseCase,
   ) {}
 
+  /**
+   * Login endpoint
+   *
+   * Authenticates a user and returns a JWT token along with basic user info.
+   *
+   * @param {AuthDto} authDto - The authentication credentials
+   * @returns {Promise<AuthResponseDto>} Authentication response with token and user data
+   */
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Autenticar usuário', description: 'Realiza o login do usuário e retorna um token JWT' })
@@ -51,6 +80,14 @@ export class AuthController {
     });
   }
 
+  /**
+   * Current user profile endpoint
+   *
+   * Retrieves the complete profile information of the authenticated user.
+   *
+   * @param {IJwtPayload} user - The authenticated user (injected by CurrentUser decorator)
+   * @returns {Promise<UserMeResponseDto>} The current user's complete profile information
+   */
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')

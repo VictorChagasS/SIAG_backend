@@ -1,3 +1,12 @@
+/**
+ * Import Class With Students Controller
+ *
+ * Controller responsible for handling HTTP requests related to importing
+ * classes and their students from Excel files. This provides a convenient
+ * way to create classes and add multiple students at once.
+ *
+ * @module ClassesController
+ */
 import {
   Controller,
   Post,
@@ -22,11 +31,33 @@ import { ImportResultDto } from '@/modules/classes/presentation/dtos/import-resu
 
 @ApiTags('classes')
 @Controller('classes')
+/**
+ * Controller for handling class and student import from Excel files
+ *
+ * Provides endpoints for:
+ * - Creating a new class with students from an Excel file
+ * - Adding students to an existing class from an Excel file
+ *
+ * @class ImportClassWithStudentsController
+ */
 export class ImportClassWithStudentsController {
+  /**
+   * Creates an ImportClassWithStudentsController instance with injected use cases
+   *
+   * @param {ImportClassWithStudentsUseCase} importClassWithStudentsUseCase - Use case for importing classes with students
+   */
   constructor(
     private readonly importClassWithStudentsUseCase: ImportClassWithStudentsUseCase,
   ) {}
 
+  /**
+   * Imports a new class with students from an Excel file
+   *
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @param {Express.Multer.File} file - The uploaded Excel file
+   * @returns {Promise<Object>} Import result with class details and student counts
+   * @throws {Error} If the file is not a valid Excel file or contains invalid data
+   */
   @Post('import')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -89,6 +120,17 @@ export class ImportClassWithStudentsController {
     };
   }
 
+  /**
+   * Imports students to an existing class from an Excel file
+   *
+   * @param {string} classId - ID of the existing class to add students to
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @param {Express.Multer.File} file - The uploaded Excel file
+   * @returns {Promise<Object>} Import result with class details and student counts
+   * @throws {Error} If the file is not a valid Excel file or contains invalid data
+   * @throws {NotFoundException} If the class doesn't exist
+   * @throws {ForbiddenException} If the user doesn't have permission to modify the class
+   */
   @Post(':classId/import-students')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -155,6 +197,17 @@ export class ImportClassWithStudentsController {
     };
   }
 
+  /**
+   * Validates if a file is an Excel spreadsheet
+   *
+   * Checks both the mimetype and file extension to determine if the file
+   * is a valid Excel file (.xlsx or .xls)
+   *
+   * @param {string} mimetype - The MIME type of the file
+   * @param {string} filename - The original filename with extension
+   * @returns {boolean} True if the file is an Excel file, false otherwise
+   * @private
+   */
   private isExcelFile(mimetype: string, filename: string): boolean {
     // Verificar pelo MIME type
     const validMimeTypes = [

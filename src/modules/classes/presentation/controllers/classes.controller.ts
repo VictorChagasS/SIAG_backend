@@ -1,3 +1,12 @@
+/**
+ * Classes Controller
+ *
+ * Controller responsible for handling HTTP requests related to classes management.
+ * Provides endpoints for creating, reading, updating, and deleting classes,
+ * as well as specialized operations like exporting templates and updating formulas.
+ *
+ * @module ClassesController
+ */
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Query,
 } from '@nestjs/common';
@@ -32,6 +41,17 @@ import { PaginatedClassResponseDto } from '../dtos/paginated-class-response.dto'
 
 @ApiTags('classes')
 @Controller('classes')
+/**
+ * Controller for handling class-related HTTP requests
+ *
+ * Provides endpoints for class management operations including:
+ * - Creating, reading, updating, and deleting classes
+ * - Listing classes with various filters
+ * - Exporting class data as Excel templates
+ * - Managing class grade formulas
+ *
+ * @class ClassesController
+ */
 export class ClassesController {
   constructor(
     private readonly createClassUseCase: CreateClassUseCase,

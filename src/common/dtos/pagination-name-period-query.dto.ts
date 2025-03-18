@@ -1,14 +1,30 @@
+/**
+ * Combined Pagination Query DTOs
+ *
+ * Combined DTOs for pagination with name and/or period filtering.
+ * These DTOs extend the base pagination DTO with additional search parameters.
+ *
+ * @module CommonDTOs
+ */
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 import { PaginationQueryDto } from './pagination-query.dto';
 
 /**
- * DTO combinado para paginação, pesquisa por nome e período
+ * DTO for pagination with name and period filtering
+ *
+ * Extends the base pagination DTO with name and period search parameters.
+ * Commonly used for academic/class-related API endpoints.
+ *
+ * @class PaginationNamePeriodQueryDto
+ * @extends {PaginationQueryDto}
  */
 export class PaginationNamePeriodQueryDto extends PaginationQueryDto {
   /**
-   * Propriedades de NameSearchQueryDto
+   * Optional name filter parameter
+   *
+   * Used to filter results by name using a case-insensitive contains match
    */
   @ApiProperty({
     description: 'Filtrar por nome',
@@ -19,7 +35,10 @@ export class PaginationNamePeriodQueryDto extends PaginationQueryDto {
     name?: string;
 
   /**
-   * Propriedades de PeriodSearchQueryDto
+   * Optional period filter parameter
+   *
+   * Used to filter results by academic period (e.g., "2023.1")
+   * Generally follows the format YYYY.N where N is the semester number
    */
   @ApiProperty({
     description: 'Filtrar por período (ex: 2023.1)',
@@ -31,11 +50,19 @@ export class PaginationNamePeriodQueryDto extends PaginationQueryDto {
 }
 
 /**
- * DTO para paginação e pesquisa por nome
+ * DTO for pagination with name filtering
+ *
+ * Extends the base pagination DTO with a name search parameter.
+ * Used for API endpoints that need pagination and name-based filtering.
+ *
+ * @class PaginationNameQueryDto
+ * @extends {PaginationQueryDto}
  */
 export class PaginationNameQueryDto extends PaginationQueryDto {
   /**
-   * Propriedades de NameSearchQueryDto
+   * Optional name filter parameter
+   *
+   * Used to filter results by name using a case-insensitive contains match
    */
   @ApiProperty({
     description: 'Filtrar por nome',

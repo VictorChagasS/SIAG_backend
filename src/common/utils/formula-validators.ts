@@ -1,9 +1,22 @@
+/**
+ * Formula Validators
+ *
+ * Utility functions for validating mathematical formulas,
+ * particularly those used for grade calculations in educational contexts.
+ *
+ * @module CommonUtils
+ */
 import { BadRequestException } from '@nestjs/common';
 
 /**
- * Valida uma fórmula personalizada para cálculo de médias
- * @param formula A fórmula a ser validada
- * @param unitCount Quantidade de unidades disponíveis
+ * Validates a personalized formula for grade calculation
+ *
+ * Checks if the formula is mathematically valid and uses the correct
+ * references to available units (N1, N2, etc.).
+ *
+ * @param {string} formula - The formula to validate
+ * @param {number} unitCount - Number of available units/periods
+ * @throws {BadRequestException} If the formula is invalid
  */
 export function validatePersonalizedFormula(formula: string, unitCount: number): void {
   // Encontrar todas as referências a N1, N2, etc. na fórmula
@@ -48,8 +61,13 @@ export function validatePersonalizedFormula(formula: string, unitCount: number):
 }
 
 /**
- * Valida se uma expressão matemática é válida
- * @param formula A fórmula a ser validada
+ * Validates if a string is a valid mathematical expression
+ *
+ * Performs various checks to ensure the formula is a valid
+ * mathematical expression with proper syntax.
+ *
+ * @param {string} formula - The formula to validate
+ * @throws {BadRequestException} If the formula contains invalid syntax
  */
 export function validateMathExpression(formula: string): void {
   // Remover espaços em branco para facilitar a validação

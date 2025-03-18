@@ -2,11 +2,15 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 /**
- * DTO para busca de estudantes
+ * DTO for handling student search queries
+ * Contains a single search parameter that can match either name or registration number
+ *
+ * @class StudentSearchQueryDto
+ * @property {string} [search] - Search term to filter students by name or registration number
  */
 export class StudentSearchQueryDto {
   @ApiProperty({
-    description: 'Termo de busca para filtrar por nome ou matrícula do estudante',
+    description: 'Search term to filter students by name or registration number',
     required: false,
   })
   @IsOptional()

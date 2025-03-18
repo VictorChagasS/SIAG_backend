@@ -1,22 +1,54 @@
+/**
+ * Update Class Formula Use Case
+ *
+ * This use case handles the updating of a class's grade calculation formula
+ * with validation to ensure the formula is valid and the user is authorized.
+ *
+ * @module ClassUseCases
+ */
 import {
   Inject, Injectable, NotFoundException, ForbiddenException, BadRequestException,
 } from '@nestjs/common';
 
+import { validatePersonalizedFormula } from '@/common/utils/formula-validators';
 import { IUnitRepository } from '@/modules/units/domain/repositories/unit-repository.interface';
 import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
-import { validatePersonalizedFormula } from '@/shared/utils/formula-validators';
 
 import { CLASS_REPOSITORY } from '../../classes.providers';
 import { Class, ITypeFormula } from '../entities/class.entity';
 import { IClassRepository } from '../repositories/class-repository.interface';
 
+/**
+ * Parameters for updating a class's grade calculation formula
+ *
+ * Contains fields for setting or changing the formula type and expression.
+ *
+ * @interface IUpdateClassFormulaDTO
+ */
 export interface IUpdateClassFormulaDTO {
+  /** Formula expression (required when typeFormula is 'personalized') */
   formula?: string;
+
+  /** Type of formula to use (simple or personalized) */
   typeFormula: ITypeFormula;
 }
 
+/**
+ * Use case for updating a class's grade calculation formula
+ *
+ * Handles the business logic for updating a class's grade calculation formula,
+ * including authorization checks and formula validation.
+ *
+ * @class UpdateClassFormulaUseCase
+ */
 @Injectable()
 export class UpdateClassFormulaUseCase {
+  /**
+   * Creates an instance of UpdateClassFormulaUseCase
+   *
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @param {IUnitRepository} unitRepository - Repository for unit data access (needed for formula validation)
+   */
   constructor(
     @Inject(CLASS_REPOSITORY)
     private classRepository: IClassRepository,
@@ -24,6 +56,20 @@ export class UpdateClassFormulaUseCase {
     private unitRepository: IUnitRepository,
   ) {}
 
+  /**
+   * Executes the update class formula use case
+   *
+   * Updates a class's grade calculation formula after performing validation
+   * and authorization checks to ensure the operation is valid.
+   *
+   * @param {string} id - ID of the class to update
+   * @param {IUpdateClassFormulaDTO} data - New formula data to update the class with
+   * @param {string} teacherId - ID of the teacher making the request (for authorization)
+   * @returns {Promise<Class>} The updated class entity
+   * @throws {NotFoundException} If the class is not found
+   * @throws {ForbiddenException} If the teacher is not authorized to update this class
+   * @throws {BadRequestException} If the formula is invalid or missing required units
+   */
   async execute(id: string, data: IUpdateClassFormulaDTO, teacherId: string): Promise<Class> {
     // Verificar se a turma existe
     const classExists = await this.classRepository.findById(id);

@@ -1,3 +1,11 @@
+/**
+ * Update Class Use Case
+ *
+ * This use case handles the updating of an existing class with validation
+ * to ensure data integrity and proper authorization.
+ *
+ * @module ClassUseCases
+ */
 import {
   Inject, Injectable, NotFoundException, ConflictException, ForbiddenException,
 } from '@nestjs/common';
@@ -6,19 +14,59 @@ import { CLASS_REPOSITORY } from '../../classes.providers';
 import { Class } from '../entities/class.entity';
 import { IClassRepository } from '../repositories/class-repository.interface';
 
+/**
+ * Parameters for updating a class
+ *
+ * Contains the optional fields that can be updated on a class entity.
+ * All fields are optional since updates can be partial.
+ *
+ * @interface IUpdateClassDTO
+ */
 export interface IUpdateClassDTO {
+  /** Updated name of the class */
   name?: string;
+
+  /** Updated academic period (e.g., "2025.2") */
   period?: string;
+
+  /** Updated section number */
   section?: number;
 }
 
+/**
+ * Use case for updating an existing class
+ *
+ * Handles the business logic for updating a class, including authorization
+ * checks and validation to prevent duplicates.
+ *
+ * @class UpdateClassUseCase
+ */
 @Injectable()
 export class UpdateClassUseCase {
+  /**
+   * Creates an instance of UpdateClassUseCase
+   *
+   * @param {IClassRepository} classRepository - Repository for class data access
+   */
   constructor(
     @Inject(CLASS_REPOSITORY)
     private classRepository: IClassRepository,
   ) {}
 
+  /**
+   * Executes the update class use case
+   *
+   * Updates an existing class with new data after performing validation
+   * and authorization checks to ensure the operation is valid.
+   *
+   * @param {string} id - ID of the class to update
+   * @param {IUpdateClassDTO} data - New data to update the class with
+   * @param {string} teacherId - ID of the teacher making the request (for authorization)
+   * @returns {Promise<Class>} The updated class entity
+   * @throws {NotFoundException} If the class is not found
+   * @throws {ForbiddenException} If the teacher is not authorized to update this class
+   * @throws {ConflictException} If a class with the same name, period, and section already exists
+   */
   async execute(id: string, data: IUpdateClassDTO, teacherId: string): Promise<Class> {
     const classExists = await this.classRepository.findById(id);
 

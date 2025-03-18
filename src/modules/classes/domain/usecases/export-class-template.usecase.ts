@@ -1,3 +1,11 @@
+/**
+ * Export Class Template Use Case
+ *
+ * This use case handles the generation and export of class templates with student
+ * information and grade averages in Excel format.
+ *
+ * @module ClassUseCases
+ */
 import * as path from 'path';
 
 import {
@@ -10,14 +18,41 @@ import { CalculateAllAveragesUseCase } from '@/modules/grades/domain/usecases/ca
 import { CLASS_REPOSITORY } from '../../classes.providers';
 import { IClassRepository } from '../repositories/class-repository.interface';
 
+/**
+ * Use case for exporting class data to an Excel template
+ *
+ * Handles the creation of an Excel file containing class information,
+ * student data, and grade averages based on a predefined template.
+ *
+ * @class ExportClassTemplateUseCase
+ */
 @Injectable()
 export class ExportClassTemplateUseCase {
+  /**
+   * Creates an instance of ExportClassTemplateUseCase
+   *
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @param {CalculateAllAveragesUseCase} calculateAllAveragesUseCase - Use case for calculating student grade averages
+   */
   constructor(
     @Inject(CLASS_REPOSITORY)
     private classRepository: IClassRepository,
     private calculateAllAveragesUseCase: CalculateAllAveragesUseCase,
   ) {}
 
+  /**
+   * Executes the class template export process
+   *
+   * Generates an Excel file with class and student information based on a predefined template.
+   * Validates that the class exists, the teacher has permission, and there are sufficient units.
+   *
+   * @param {string} classId - ID of the class to export
+   * @param {string} teacherId - ID of the teacher requesting the export (for authorization)
+   * @returns {Promise<Buffer>} Excel file as a buffer
+   * @throws {NotFoundException} If the class doesn't exist
+   * @throws {ForbiddenException} If the teacher doesn't own the class
+   * @throws {BadRequestException} If there aren't at least 3 units
+   */
   async execute(classId: string, teacherId: string): Promise<Buffer> {
     // Buscar os dados da turma
     const classEntity = await this.classRepository.findById(classId);
@@ -41,7 +76,7 @@ export class ExportClassTemplateUseCase {
     }
 
     // Caminho para o arquivo template.xlsx
-    const templatePath = path.resolve(process.cwd(), 'src/shared/utils/template.xlsx');
+    const templatePath = path.resolve(process.cwd(), 'src/common/utils/template.xlsx');
 
     try {
       // Criar um novo workbook

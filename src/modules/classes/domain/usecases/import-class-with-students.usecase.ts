@@ -11,12 +11,28 @@ import { CLASS_REPOSITORY } from '../../classes.providers';
 import { Class } from '../entities/class.entity';
 import { IClassRepository } from '../repositories/class-repository.interface';
 
+/**
+ * DTO for importing a class with students from an Excel file
+ *
+ * Contains the necessary data for importing a class and its students
+ * from an Excel file.
+ *
+ * @interface IImportClassWithStudentsDTO
+ */
 export interface IImportClassWithStudentsDTO {
   teacherId: string;
   file: Buffer;
   existingClassId?: string; // Opcional: se fornecido, adiciona estudantes a uma turma existente
 }
 
+/**
+ * Result object for importing a class with students
+ *
+ * Contains the imported class, the number of students added,
+ * the number of students skipped, and any errors encountered.
+ *
+ * @interface IImportClassWithStudentsResult
+ */
 export interface IImportClassWithStudentsResult {
   class: Class;
   studentsAdded: number;
@@ -24,6 +40,14 @@ export interface IImportClassWithStudentsResult {
   errors: string[];
 }
 
+/**
+ * Use case for importing a class with students from an Excel file
+ *
+ * Handles the import of a class and its students from an Excel file,
+ * including validation and processing of the data.
+ *
+ * @Injectable()
+ */
 @Injectable()
 export class ImportClassWithStudentsUseCase {
   constructor(
@@ -34,24 +58,24 @@ export class ImportClassWithStudentsUseCase {
   ) {}
 
   async execute(data: IImportClassWithStudentsDTO): Promise<IImportClassWithStudentsResult> {
-    // Processar o arquivo Excel
+    // Load the Excel file
     const workbook = new ExcelJS.Workbook();
     try {
-      // Convertendo o Buffer para Uint8Array para compatibilidade
+      // Convert the Buffer to Uint8Array for compatibility
       const buffer = Buffer.from(data.file);
       await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
     } catch (error) {
       throw new BadRequestException('Arquivo Excel inválido ou corrompido');
     }
 
-    const worksheet = workbook.getWorksheet(1); // Pega a primeira planilha
+    const worksheet = workbook.getWorksheet(1); // Get the first worksheet
     if (!worksheet) {
       throw new BadRequestException('Planilha não encontrada no arquivo');
     }
 
     let classToUse: Class;
 
-    // Se um ID de turma existente foi fornecido, usar essa turma
+    // If an existing class ID was provided, use that class
     if (data.existingClassId) {
       const existingClass = await this.classRepository.findById(data.existingClassId);
 
@@ -59,17 +83,17 @@ export class ImportClassWithStudentsUseCase {
         throw new BadRequestException('Turma não encontrada');
       }
 
-      // Verificar se o professor é o dono da turma
+      // Check if the teacher is the owner of the class
       if (existingClass.teacherId !== data.teacherId) {
-        throw new BadRequestException('Você não tem permissão para adicionar estudantes a esta turma');
+        throw new BadRequestException('You do not have permission to add students to this class');
       }
 
       classToUse = existingClass;
     } else {
-      // Caso contrário, extrair informações da turma do cabeçalho da planilha e criar uma nova
+      // Otherwise, extract class information from the header of the worksheet and create a new class
       const classInfo = this.extractClassInfoFromHeader(worksheet);
 
-      // Verificar se já existe uma turma com o mesmo nome e período para este professor
+      // Check if a class with the same name and period already exists for this teacher
       const existingClass = await this.classRepository.findByNamePeriodAndTeacher(
         classInfo.name,
         classInfo.period,
@@ -82,7 +106,7 @@ export class ImportClassWithStudentsUseCase {
         );
       }
 
-      // Criar a nova turma
+      // Create the new class
       const newClass = new Class({
         name: classInfo.name,
         code: classInfo.code,
@@ -93,7 +117,7 @@ export class ImportClassWithStudentsUseCase {
       classToUse = await this.classRepository.create(newClass);
     }
 
-    // Processar os estudantes da planilha
+    // Process the students from the worksheet
     const studentsResult = await this.processStudents(worksheet, classToUse.id);
 
     return {
@@ -105,11 +129,11 @@ export class ImportClassWithStudentsUseCase {
   }
 
   private extractClassInfoFromHeader(worksheet: ExcelJS.Worksheet): { name: string; code: string; period: string } {
-    // Tentar extrair informações do cabeçalho da planilha
-    // Exemplo: "PLANILHA DE NOTAS" na primeira linha
-    // "COMP0439 - ENGENHARIA DE SOFTWARE II - Turma: 02 (2024.2)" na segunda linha
+    // Try to extract information from the header of the worksheet
+    // Example: "PLANILHA DE NOTAS" in the first row
+    // "COMP0439 - ENGENHARIA DE SOFTWARE II - Turma: 02 (2024.2)" in the second row
 
-    // Verificar a segunda linha para extrair informações da turma
+    // Check the second row to extract class information
     const infosClass = worksheet.getRow(3).values[2].split(' - ');
     const code = String(infosClass[0]);
     const name = String(infosClass[1]);
@@ -134,9 +158,9 @@ export class ImportClassWithStudentsUseCase {
       errors: [],
     };
 
-    // Verificar se a linha 10 contém os cabeçalhos esperados (Matrícula e Nome)
+    // Check if the 10th row contains the expected headers (Matrícula and Nome)
     const headerRow = worksheet.getRow(10);
-    // Encontrar as colunas de matrícula e nome
+    // Find the columns of matrícula and nome
     let matriculaColIndex = -1;
     let nomeColIndex = -1;
 
@@ -149,20 +173,21 @@ export class ImportClassWithStudentsUseCase {
       }
     });
 
+    // If the columns are not found, return an error
     if (matriculaColIndex === -1 || nomeColIndex === -1) {
       result.errors.push('Formato de planilha inválido. A linha 10 deve conter as colunas "Matrícula" e "Nome".');
       return result;
     }
 
-    // Processar os estudantes a partir da linha 11
+    // Process the students from the 11th row
     const startRow = 11;
     const validRows = [];
 
-    // Primeiro, coletamos todas as linhas válidas
+    // First, collect all valid rows
     for (let rowIndex = startRow; rowIndex <= worksheet.rowCount; rowIndex += 1) {
       const row = worksheet.getRow(rowIndex);
 
-      // Pular linhas vazias
+      // Skip empty rows
       if (row.cellCount === 0) {
         // eslint-disable-next-line no-continue
         continue;
@@ -171,7 +196,7 @@ export class ImportClassWithStudentsUseCase {
       const matricula = String(row.getCell(matriculaColIndex).value || '').trim();
       const nome = String(row.getCell(nomeColIndex).value || '').trim();
 
-      // Pular linhas sem matrícula ou nome
+      // Skip rows without matrícula or nome
       if (!matricula || !nome) {
         // eslint-disable-next-line no-continue
         continue;
@@ -180,10 +205,10 @@ export class ImportClassWithStudentsUseCase {
       validRows.push({ rowIndex, matricula, nome });
     }
 
-    // Agora processamos todas as linhas válidas de uma vez
+    // Now process all valid rows at once
     await Promise.all(validRows.map(async ({ rowIndex, matricula, nome }) => {
       try {
-        // Verificar se o estudante já existe na turma
+        // Check if the student already exists in the class
         const existingStudent = await this.studentRepository.findByRegistrationAndClassId(
           matricula,
           classId,
@@ -194,7 +219,7 @@ export class ImportClassWithStudentsUseCase {
           return;
         }
 
-        // Criar o novo estudante
+        // Create the new student
         const newStudent = new Student({
           name: nome,
           registration: matricula,

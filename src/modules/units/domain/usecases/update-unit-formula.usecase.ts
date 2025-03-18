@@ -2,12 +2,12 @@ import {
   Inject, Injectable, NotFoundException, ForbiddenException, BadRequestException,
 } from '@nestjs/common';
 
+import { validatePersonalizedFormula } from '@/common/utils/formula-validators';
 import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
 import { ITypeFormula } from '@/modules/classes/domain/entities/class.entity';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 import { IEvaluationItemRepository } from '@/modules/evaluation-items/domain/repositories/evaluation-item-repository.interface';
 import { EVALUATION_ITEM_REPOSITORY } from '@/modules/evaluation-items/evaluation-items.providers';
-import { validatePersonalizedFormula } from '@/shared/utils/formula-validators';
 
 import { UNIT_REPOSITORY } from '../../units.providers';
 import { Unit } from '../entities/unit.entity';

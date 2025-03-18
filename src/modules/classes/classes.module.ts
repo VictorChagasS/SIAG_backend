@@ -1,3 +1,15 @@
+/**
+ * Classes Module
+ *
+ * Responsible for managing classes (courses) in the system, including creation, listing,
+ * updating, and deletion. This module also handles class-related operations like
+ * importing students, exporting templates, and formula calculation.
+ *
+ * This module integrates with Auth, Students, Units, and Grades modules to provide
+ * comprehensive class management functionality.
+ *
+ * @module ClassesModule
+ */
 import { Module, forwardRef } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 
@@ -20,12 +32,22 @@ import { GradesModule } from '@/modules/grades/grades.module';
 import { StudentsModule } from '@/modules/students/students.module';
 import { UnitsModule } from '@/modules/units/units.module';
 
+/**
+ * NestJS Classes Module
+ *
+ * Defines the dependencies, providers, controllers, and exports related
+ * to class management functionality in the academic system.
+ *
+ * @class ClassesModule
+ */
 @Module({
   imports: [
+    // Circular dependencies with related modules
     forwardRef(() => AuthModule),
     forwardRef(() => StudentsModule),
     forwardRef(() => UnitsModule),
     forwardRef(() => GradesModule),
+    // File upload configuration for importing class data
     MulterModule.register({
       limits: {
         fileSize: 5 * 1024 * 1024, // 5MB
@@ -37,6 +59,7 @@ import { UnitsModule } from '@/modules/units/units.module';
     ImportClassWithStudentsController,
   ],
   providers: [
+    // Use cases for class management
     CreateClassUseCase,
     GetClassUseCase,
     ListClassesUseCase,
@@ -48,9 +71,11 @@ import { UnitsModule } from '@/modules/units/units.module';
     DeleteClassUseCase,
     ImportClassWithStudentsUseCase,
     ExportClassTemplateUseCase,
+    // Repository providers
     ...classesProviders,
   ],
   exports: [
+    // Exports for use in other modules
     ...classesProviders,
     GetClassUseCase,
     ListClassesUseCase,

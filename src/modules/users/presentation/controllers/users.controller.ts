@@ -1,7 +1,11 @@
 import {
-  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,
+  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Query,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth, ApiOperation, ApiParam, ApiTags,
+} from '@nestjs/swagger';
 
+import { ApiErrorResponse, ApiResponseWrapped } from '@/common/utils/swagger.utils';
 import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
 import { AdminGuard } from '@/modules/auth/domain/guards/admin.guard';
 import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
@@ -12,9 +16,17 @@ import { GetUserProfileUseCase } from '@/modules/users/domain/usecases/get-user-
 import { ListUsersUseCase } from '@/modules/users/domain/usecases/list-users.usecase';
 import { CreateUserDto } from '@/modules/users/presentation/dtos/create-user.dto';
 import { UpdateUserDto } from '@/modules/users/presentation/dtos/update-user.dto';
+import { UserSearchQueryDto } from '@/modules/users/presentation/dtos/user-search-query.dto';
 
 import { UpdateUserUseCase } from '../../domain/usecases/update-user.usecase';
+import { UserResponseDto } from '../dtos/user-response.dto';
 
+/**
+ * Controller for handling user-related HTTP requests
+ *
+ * @class UsersController
+ */
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(
@@ -25,7 +37,16 @@ export class UsersController {
     private readonly deleteUserUseCase: DeleteUserUseCase,
   ) {}
 
+  /**
+   * Create a new user
+   *
+   * @param {CreateUserDto} createUserDto - The user data to create
+   * @returns {Promise<Object>} The created user data
+   */
   @Post()
+  @ApiOperation({ summary: 'Create user', description: 'Creates a new user' })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(400, 'Invalid data', 'INVALID_DATA', 'Invalid data')
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.createUserUseCase.execute({
       name: createUserDto.name,
@@ -45,8 +66,18 @@ export class UsersController {
     };
   }
 
+  /**
+   * Get the profile of the authenticated user
+   *
+   * @param {IJwtPayload} user - The authenticated user data
+   * @returns {Promise<Object>} The user profile data
+   */
   @Get('profile')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Get profile', description: 'Gets the profile of the authenticated user' })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED', 'Unauthorized')
   async getProfile(@CurrentUser() user: IJwtPayload) {
     const profile = await this.getUserProfileUseCase.execute(user.sub);
 
@@ -60,10 +91,24 @@ export class UsersController {
     };
   }
 
+  /**
+   * List all users with optional search filtering
+   *
+   * @param {UserSearchQueryDto} query - The search query parameters
+   * @returns {Promise<Object[]>} Array of users matching the criteria
+   */
   @Get()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async listAll() {
-    const users = await this.listUsersUseCase.execute();
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'List users',
+    description: 'Lists all users with optional search filtering by name or email (admin only)',
+  })
+  @ApiResponseWrapped(UserResponseDto, true)
+  @ApiErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED', 'Unauthorized')
+  @ApiErrorResponse(403, 'Forbidden', 'FORBIDDEN', 'Forbidden')
+  async listAll(@Query() query: UserSearchQueryDto) {
+    const users = await this.listUsersUseCase.execute(query);
 
     return users.map((user) => ({
       id: user.id,
@@ -75,8 +120,22 @@ export class UsersController {
     }));
   }
 
+  /**
+   * Update user data
+   *
+   * @param {string} id - The user ID to update
+   * @param {UpdateUserDto} updateUserDto - The data to update
+   * @returns {Promise<Object>} Object containing before and after states
+   */
   @Patch(':id')
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Update user', description: 'Updates a user by ID (admin only)' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED', 'Unauthorized')
+  @ApiErrorResponse(403, 'Forbidden', 'FORBIDDEN', 'Forbidden')
+  @ApiErrorResponse(404, 'User not found', 'NOT_FOUND', 'User not found')
   async update(
   @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -110,8 +169,22 @@ export class UsersController {
     };
   }
 
+  /**
+   * Delete a user
+   *
+   * @param {string} id - The user ID to delete
+   * @param {IJwtPayload} currentUser - The authenticated user data
+   * @returns {Promise<Object>} Success message
+   */
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Delete user', description: 'Deletes a user by ID (user can delete own profile, admin can delete any)' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED', 'Unauthorized')
+  @ApiErrorResponse(403, 'Forbidden', 'FORBIDDEN', 'Forbidden')
+  @ApiErrorResponse(404, 'User not found', 'NOT_FOUND', 'User not found')
   async delete(
   @Param('id') id: string,
     @CurrentUser() currentUser: IJwtPayload,
