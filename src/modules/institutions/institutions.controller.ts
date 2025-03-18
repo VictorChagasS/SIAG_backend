@@ -32,12 +32,6 @@ export class InstitutionsController {
               mode: 'insensitive',
             },
           },
-          // {
-          //   acronym: {
-          //     contains: search,
-          //     mode: Prisma.QueryMode.insensitive,
-          //   },
-          // },
         ],
       }
       : {};

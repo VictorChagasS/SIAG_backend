@@ -14,4 +14,4 @@ export class ListClassesUseCase {
   async execute(): Promise<Class[]> {
     return this.classRepository.findAll();
   }
-} 
+}

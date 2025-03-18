@@ -7,7 +7,6 @@ import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
 import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 
 import { CalculateAllAveragesUseCase } from '../../domain/usecases/calculate-all-averages.usecase';
-import { CalculateClassAverageUseCase } from '../../domain/usecases/calculate-class-average.usecase';
 import { CalculateUnitAverageUseCase } from '../../domain/usecases/calculate-unit-average.usecase';
 import { CreateGradeUseCase } from '../../domain/usecases/create-grade.usecase';
 import { UpsertStudentGradesUseCase } from '../../domain/usecases/create-many-grades.usecase';
@@ -30,22 +29,6 @@ interface IUnitAverageResult {
     evaluationItemId: string;
     evaluationItemName: string;
     value: number;
-  }>;
-}
-
-interface IClassAverageResult {
-  classId: string;
-  className: string;
-  average: number;
-  studentAverages: Array<{
-    studentId: string;
-    studentName: string;
-    average: number;
-    unitAverages: Array<{
-      unitId: string;
-      unitName: string;
-      average: number;
-    }>;
   }>;
 }
 
@@ -74,7 +57,6 @@ export class GradesController {
     private getGradesByUnitUseCase: GetGradesByUnitUseCase,
     private getStudentGradesByUnitUseCase: GetStudentGradesByUnitUseCase,
     private calculateUnitAverageUseCase: CalculateUnitAverageUseCase,
-    private calculateClassAverageUseCase: CalculateClassAverageUseCase,
     private calculateAllAveragesUseCase: CalculateAllAveragesUseCase,
   ) {}
 
@@ -85,10 +67,7 @@ export class GradesController {
     @CurrentUser() currentUser: IJwtPayload,
   ) {
     const gradeCreated = await this.createGradeUseCase.execute({
-      studentId: createGradeDto.studentId,
-      evaluationItemId: createGradeDto.evaluationItemId,
-      value: createGradeDto.value,
-      comments: createGradeDto.comments,
+      ...createGradeDto,
       teacherId: currentUser.sub,
     });
 
@@ -120,8 +99,7 @@ export class GradesController {
   ) {
     const gradeUpdated = await this.updateGradeUseCase.execute({
       id,
-      value: updateGradeDto.value,
-      comments: updateGradeDto.comments,
+      ...updateGradeDto,
       teacherId: currentUser.sub,
     });
 
@@ -176,20 +154,6 @@ export class GradesController {
       currentUser.sub,
     );
     return average as IUnitAverageResult;
-  }
-
-  // Remove it
-  @Get('class/:classId/average')
-  @UseGuards(JwtAuthGuard)
-  async calculateClassAverage(
-    @Param('classId') classId: string,
-      @CurrentUser() currentUser: IJwtPayload,
-  ): Promise<IClassAverageResult> {
-    const average = await this.calculateClassAverageUseCase.execute(
-      classId,
-      currentUser.sub,
-    );
-    return average as unknown as IClassAverageResult;
   }
 
   @Get('class/:classId/all-averages')

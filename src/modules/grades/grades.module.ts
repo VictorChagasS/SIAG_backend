@@ -8,7 +8,6 @@ import { UnitsModule } from '@/modules/units/units.module';
 import { PrismaModule } from '@/prisma/prisma.module';
 
 import { CalculateAllAveragesUseCase } from './domain/usecases/calculate-all-averages.usecase';
-import { CalculateClassAverageUseCase } from './domain/usecases/calculate-class-average.usecase';
 import { CalculateStudentAverageUseCase } from './domain/usecases/calculate-student-average.usecase';
 import { CalculateUnitAverageUseCase } from './domain/usecases/calculate-unit-average.usecase';
 import { CreateGradeUseCase } from './domain/usecases/create-grade.usecase';
@@ -43,10 +42,9 @@ import { GradesController } from './presentation/controllers/grades.controller';
     GetGradesByUnitUseCase,
     GetStudentGradesByUnitUseCase,
     CalculateUnitAverageUseCase,
-    CalculateClassAverageUseCase,
     CalculateAllAveragesUseCase,
     CalculateStudentAverageUseCase,
   ],
-  exports: [GRADE_REPOSITORY, CalculateStudentAverageUseCase, CalculateClassAverageUseCase, CalculateAllAveragesUseCase],
+  exports: [GRADE_REPOSITORY, CalculateStudentAverageUseCase, CalculateAllAveragesUseCase],
 })
 export class GradesModule {}

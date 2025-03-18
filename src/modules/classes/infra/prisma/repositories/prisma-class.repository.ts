@@ -21,7 +21,7 @@ export class PrismaClassRepository implements IClassRepository {
 
     return {
       ...createdClass,
-      studentCount: 0, // Nova turma, sem estudantes
+      studentCount: 0,
     };
   }
 

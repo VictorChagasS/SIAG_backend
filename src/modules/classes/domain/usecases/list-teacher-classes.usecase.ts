@@ -14,4 +14,4 @@ export class ListTeacherClassesUseCase {
   async execute(teacherId: string): Promise<Class[]> {
     return this.classRepository.findByTeacherId(teacherId);
   }
-} 
+}

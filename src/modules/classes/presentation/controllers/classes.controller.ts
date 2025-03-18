@@ -79,6 +79,7 @@ export class ClassesController {
       name: createClassDto.name,
       code: createClassDto.code,
       period: createClassDto.period,
+      section: createClassDto.section,
       teacherId,
     });
 
