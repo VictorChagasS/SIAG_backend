@@ -9,12 +9,18 @@ import {
   MaxFileSizeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiConsumes, ApiBody,
+} from '@nestjs/swagger';
 
+import { ApiErrorResponse, ApiResponseWrapped } from '@/common/utils/swagger.utils';
 import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
 import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 import { ImportClassWithStudentsUseCase } from '@/modules/classes/domain/usecases/import-class-with-students.usecase';
+import { ImportResultDto } from '@/modules/classes/presentation/dtos/import-result.dto';
 
+@ApiTags('classes')
 @Controller('classes')
 export class ImportClassWithStudentsController {
   constructor(
@@ -23,6 +29,27 @@ export class ImportClassWithStudentsController {
 
   @Post('import')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Importar nova turma com estudantes',
+    description: 'Importa uma nova turma com estudantes a partir de um arquivo Excel',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Arquivo Excel (.xlsx ou .xls) com os dados da turma e estudantes',
+        },
+      },
+    },
+  })
+  @ApiResponseWrapped(ImportResultDto)
+  @ApiErrorResponse(400, 'Arquivo inválido ou dados incorretos', 'INVALID_DATA', 'Dados inválidos')
+  @ApiErrorResponse(403, 'Acesso negado', 'FORBIDDEN', 'Acesso negado')
   @UseInterceptors(FileInterceptor('file'))
   async importNewClass(
   @CurrentUser() currentUser: IJwtPayload,
@@ -64,6 +91,29 @@ export class ImportClassWithStudentsController {
 
   @Post(':classId/import-students')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Importar estudantes para turma existente',
+    description: 'Importa estudantes para uma turma existente a partir de um arquivo Excel',
+  })
+  @ApiParam({ name: 'classId', description: 'ID da turma' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Arquivo Excel (.xlsx ou .xls) com os dados dos estudantes',
+        },
+      },
+    },
+  })
+  @ApiResponseWrapped(ImportResultDto)
+  @ApiErrorResponse(400, 'Arquivo inválido ou dados incorretos', 'INVALID_DATA', 'Dados inválidos')
+  @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(403, 'Você não tem permissão para acessar esta turma', 'FORBIDDEN', 'Acesso negado')
   @UseInterceptors(FileInterceptor('file'))
   async importStudentsToExistingClass(
   @Param('classId') classId: string,

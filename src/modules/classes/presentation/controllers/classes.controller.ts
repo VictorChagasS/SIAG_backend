@@ -1,8 +1,12 @@
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth, ApiTags, ApiOperation, ApiParam,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
+import { ApiErrorResponse, ApiResponseWrapped } from '@/common/utils/swagger.utils';
 import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
 import { AdminGuard } from '@/modules/auth/domain/guards/admin.guard';
 import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
@@ -17,10 +21,12 @@ import { ListClassesUseCase } from '@/modules/classes/domain/usecases/list-class
 import { ListTeacherClassesUseCase } from '@/modules/classes/domain/usecases/list-teacher-classes.usecase';
 import { UpdateClassFormulaUseCase } from '@/modules/classes/domain/usecases/update-class-formula.usecase';
 import { UpdateClassUseCase } from '@/modules/classes/domain/usecases/update-class.usecase';
+import { ClassResponseDto } from '@/modules/classes/presentation/dtos/class-response.dto';
 import { CreateClassDto } from '@/modules/classes/presentation/dtos/create-class.dto';
 import { UpdateClassFormulaDto } from '@/modules/classes/presentation/dtos/update-class-formula.dto';
 import { UpdateClassDto } from '@/modules/classes/presentation/dtos/update-class.dto';
 
+@ApiTags('classes')
 @Controller('classes')
 export class ClassesController {
   constructor(
@@ -38,6 +44,15 @@ export class ClassesController {
 
   @Get(':id/export')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Exportar template da turma',
+    description: 'Exporta um arquivo Excel com o template da turma contendo as médias dos alunos',
+  })
+  @ApiParam({ name: 'id', description: 'ID da turma' })
+  @ApiErrorResponse(403, 'Você não tem permissão para exportar esta turma', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(400, 'É necessário ter pelo menos 3 unidades para exportar o template', 'INVALID_DATA', 'Dados inválidos')
   async exportTemplate(
   @Param('id') id: string,
     @CurrentUser() currentUser: IJwtPayload,
@@ -68,6 +83,10 @@ export class ClassesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Criar turma', description: 'Cria uma nova turma' })
+  @ApiResponseWrapped(ClassResponseDto)
+  @ApiErrorResponse(400, 'Dados inválidos', 'INVALID_DATA', 'Dados inválidos')
   async create(
   @Body() createClassDto: CreateClassDto,
     @CurrentUser() currentUser: IJwtPayload,
@@ -88,6 +107,10 @@ export class ClassesController {
 
   @Get()
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Listar todas as turmas', description: 'Lista todas as turmas (requer privilégios de administrador)' })
+  @ApiResponseWrapped(ClassResponseDto, true)
+  @ApiErrorResponse(403, 'Acesso negado', 'FORBIDDEN', 'Acesso negado')
   async findAll() {
     const classes = await this.listClassesUseCase.execute();
 
@@ -96,6 +119,10 @@ export class ClassesController {
 
   @Get('active')
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Listar turmas ativas', description: 'Lista todas as turmas ativas (requer privilégios de administrador)' })
+  @ApiResponseWrapped(ClassResponseDto, true)
+  @ApiErrorResponse(403, 'Acesso negado', 'FORBIDDEN', 'Acesso negado')
   async findAllActive() {
     const classes = await this.listActiveClassesUseCase.execute();
 
@@ -104,6 +131,9 @@ export class ClassesController {
 
   @Get('my-classes')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Listar turmas do professor', description: 'Lista todas as turmas do professor atual' })
+  @ApiResponseWrapped(ClassResponseDto, true)
   async findAllByTeacher(@CurrentUser() currentUser: IJwtPayload) {
     const classes = await this.listTeacherClassesUseCase.execute(currentUser.sub);
 
@@ -112,6 +142,9 @@ export class ClassesController {
 
   @Get('my-classes/active')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Listar turmas ativas do professor', description: 'Lista todas as turmas ativas do professor atual' })
+  @ApiResponseWrapped(ClassResponseDto, true)
   async findAllActiveByTeacher(@CurrentUser() currentUser: IJwtPayload) {
     const classes = await this.listActiveTeacherClassesUseCase.execute(currentUser.sub);
 
@@ -120,6 +153,11 @@ export class ClassesController {
 
   @Get('my-classes/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Obter turma do professor', description: 'Obtém uma turma específica do professor atual pelo ID' })
+  @ApiParam({ name: 'id', description: 'ID da turma' })
+  @ApiResponseWrapped(ClassResponseDto)
+  @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
   async findOne(@Param('id') id: string) {
     const classFound = await this.getClassUseCase.execute(id);
 
@@ -128,6 +166,12 @@ export class ClassesController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Atualizar turma', description: 'Atualiza uma turma existente' })
+  @ApiParam({ name: 'id', description: 'ID da turma' })
+  @ApiResponseWrapped(ClassResponseDto)
+  @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(403, 'Você não tem permissão para atualizar esta turma', 'FORBIDDEN', 'Acesso negado')
   async update(
   @Param('id') id: string,
     @Body() updateClassDto: UpdateClassDto,
@@ -144,6 +188,13 @@ export class ClassesController {
 
   @Patch(':id/formula')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Atualizar fórmula da turma', description: 'Atualiza a fórmula de cálculo de média da turma' })
+  @ApiParam({ name: 'id', description: 'ID da turma' })
+  @ApiResponseWrapped(ClassResponseDto)
+  @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(403, 'Você não tem permissão para atualizar esta turma', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(400, 'Fórmula inválida', 'INVALID_FORMULA', 'Fórmula inválida')
   async updateFormula(
   @Param('id') id: string,
     @Body() updateClassFormulaDto: UpdateClassFormulaDto,
@@ -160,6 +211,12 @@ export class ClassesController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Remover turma', description: 'Remove uma turma existente' })
+  @ApiParam({ name: 'id', description: 'ID da turma' })
+  @ApiResponseWrapped(ClassResponseDto)
+  @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(403, 'Você não tem permissão para remover esta turma', 'FORBIDDEN', 'Acesso negado')
   async remove(@Param('id') id: string) {
     const deletedClass = await this.deleteClassUseCase.execute(id);
 

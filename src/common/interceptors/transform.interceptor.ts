@@ -7,18 +7,15 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface IResponse<T> {
-  message: string;
-  result: T;
-}
+import { ApiResponseDto } from '../dtos/api-response.dto';
 
 @Injectable()
 export class TransformInterceptor<T>
-implements NestInterceptor<T, IResponse<T>> {
+implements NestInterceptor<T, ApiResponseDto<T>> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<IResponse<T>> {
+  ): Observable<ApiResponseDto<T>> {
     return next.handle().pipe(
       map((data) => ({
         message: 'Operação realizada com sucesso',

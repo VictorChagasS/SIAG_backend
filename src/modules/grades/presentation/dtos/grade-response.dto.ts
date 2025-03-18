@@ -1,23 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min,
-} from 'class-validator';
 
-export class CreateGradeDto {
+export class GradeResponseDto {
+  @ApiProperty({
+    description: 'ID único da nota',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+    id: string;
+
   @ApiProperty({
     description: 'ID do estudante ao qual a nota pertence',
     example: '550e8400-e29b-41d4-a716-446655440001',
   })
-  @IsNotEmpty()
-  @IsUUID()
     studentId: string;
 
   @ApiProperty({
     description: 'ID do item de avaliação ao qual a nota pertence',
     example: '550e8400-e29b-41d4-a716-446655440002',
   })
-  @IsNotEmpty()
-  @IsUUID()
     evaluationItemId: string;
 
   @ApiProperty({
@@ -26,18 +25,25 @@ export class CreateGradeDto {
     minimum: 0,
     maximum: 10,
   })
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(0)
-  @Max(10)
     value: number;
 
   @ApiProperty({
     description: 'Comentários sobre a nota',
     example: 'Excelente participação em sala de aula',
     required: false,
+    nullable: true,
   })
-  @IsOptional()
-  @IsString()
     comments?: string;
-}
+
+  @ApiProperty({
+    description: 'Data de criação do registro da nota',
+    example: '2023-01-15T14:30:00.000Z',
+  })
+    createdAt: Date;
+
+  @ApiProperty({
+    description: 'Data da última atualização do registro da nota',
+    example: '2023-01-15T14:30:00.000Z',
+  })
+    updatedAt: Date;
+} 

@@ -1,7 +1,14 @@
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+} from '@nestjs/swagger';
 
+import { ApiErrorResponse, ApiResponseWrapped } from '@/common/utils/swagger.utils';
 import { CurrentUser } from '@/modules/auth/domain/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
 import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
@@ -12,8 +19,10 @@ import { GetEvaluationItemUseCase } from '../../domain/usecases/get-evaluation-i
 import { ListEvaluationItemsByUnitUseCase } from '../../domain/usecases/list-evaluation-items-by-unit.usecase';
 import { UpdateEvaluationItemUseCase } from '../../domain/usecases/update-evaluation-item.usecase';
 import { CreateEvaluationItemDto } from '../dtos/create-evaluation-item.dto';
+import { EvaluationItemResponseDto } from '../dtos/evaluation-item-response.dto';
 import { UpdateEvaluationItemDto } from '../dtos/update-evaluation-item.dto';
 
+@ApiTags('evaluation-items')
 @Controller('evaluation-items')
 export class EvaluationItemsController {
   constructor(
@@ -26,6 +35,16 @@ export class EvaluationItemsController {
 
   @Post(':unitId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Criar item de avaliação',
+    description: 'Cria um novo item de avaliação associado a uma unidade específica',
+  })
+  @ApiParam({ name: 'unitId', description: 'ID da unidade' })
+  @ApiResponseWrapped(EvaluationItemResponseDto)
+  @ApiErrorResponse(403, 'Você não tem permissão para criar itens de avaliação nesta unidade', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(404, 'Unidade não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(400, 'Dados inválidos', 'INVALID_DATA', 'Dados inválidos')
   async create(
   @Param('unitId') unitId: string,
     @Body() createEvaluationItemDto: CreateEvaluationItemDto,
@@ -42,6 +61,15 @@ export class EvaluationItemsController {
 
   @Get(':unitId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Listar itens de avaliação por unidade',
+    description: 'Lista todos os itens de avaliação de uma unidade específica',
+  })
+  @ApiParam({ name: 'unitId', description: 'ID da unidade' })
+  @ApiResponseWrapped(EvaluationItemResponseDto, true)
+  @ApiErrorResponse(403, 'Você não tem permissão para listar itens de avaliação desta unidade', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(404, 'Unidade não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
   async listByUnit(
   @Param('unitId') unitId: string,
     @CurrentUser() currentUser: IJwtPayload,
@@ -56,6 +84,16 @@ export class EvaluationItemsController {
 
   @Get(':unitId/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Obter item de avaliação por ID',
+    description: 'Obtém um item de avaliação específico pelo seu ID',
+  })
+  @ApiParam({ name: 'unitId', description: 'ID da unidade' })
+  @ApiParam({ name: 'id', description: 'ID do item de avaliação' })
+  @ApiResponseWrapped(EvaluationItemResponseDto)
+  @ApiErrorResponse(403, 'Você não tem permissão para acessar este item de avaliação', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(404, 'Item de avaliação não encontrado', 'NOT_FOUND', 'Recurso não encontrado')
   async getById(
   @Param('unitId') unitId: string,
     @Param('id') id: string,
@@ -68,6 +106,17 @@ export class EvaluationItemsController {
 
   @Patch(':unitId/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Atualizar item de avaliação',
+    description: 'Atualiza um item de avaliação existente',
+  })
+  @ApiParam({ name: 'unitId', description: 'ID da unidade' })
+  @ApiParam({ name: 'id', description: 'ID do item de avaliação' })
+  @ApiResponseWrapped(EvaluationItemResponseDto)
+  @ApiErrorResponse(403, 'Você não tem permissão para atualizar este item de avaliação', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(404, 'Item de avaliação não encontrado', 'NOT_FOUND', 'Recurso não encontrado')
+  @ApiErrorResponse(400, 'Dados inválidos', 'INVALID_DATA', 'Dados inválidos')
   async update(
   @Param('unitId') unitId: string,
     @Param('id') id: string,
@@ -85,6 +134,16 @@ export class EvaluationItemsController {
 
   @Delete(':unitId/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Remover item de avaliação',
+    description: 'Remove um item de avaliação existente',
+  })
+  @ApiParam({ name: 'unitId', description: 'ID da unidade' })
+  @ApiParam({ name: 'id', description: 'ID do item de avaliação' })
+  @ApiResponseWrapped(EvaluationItemResponseDto)
+  @ApiErrorResponse(403, 'Você não tem permissão para remover este item de avaliação', 'FORBIDDEN', 'Acesso negado')
+  @ApiErrorResponse(404, 'Item de avaliação não encontrado', 'NOT_FOUND', 'Recurso não encontrado')
   async delete(
   @Param('unitId') unitId: string,
     @Param('id') id: string,
