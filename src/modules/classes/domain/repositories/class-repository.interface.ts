@@ -1,10 +1,12 @@
+import { IPaginatedResult, IPaginationNamePeriodSearchOptions } from '@/common/interfaces/pagination.interfaces';
+
 import { Class } from '../entities/class.entity';
 
 export interface IClassRepository {
   create(classData: Class): Promise<Class>;
   findById(id: string): Promise<Class | null>;
-  findByTeacherId(teacherId: string): Promise<Class[]>;
-  findActiveByTeacherId(teacherId: string): Promise<Class[]>;
+  findByTeacherId(teacherId: string, options?: IPaginationNamePeriodSearchOptions): Promise<IPaginatedResult<Class>>;
+  findActiveByTeacherId(teacherId: string, name?: string): Promise<Class[]>;
   findAll(): Promise<Class[]>;
   findAllActive(): Promise<Class[]>;
   update(id: string, classData: Partial<Class>): Promise<Class>;

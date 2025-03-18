@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { Student } from '@/modules/students/domain/entities/student.entity';
-import { IStudentRepository } from '@/modules/students/domain/repositories/student-repository.interface';
+import { IStudentRepository, IStudentSearchOptions } from '@/modules/students/domain/repositories/student-repository.interface';
 import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
@@ -31,9 +31,33 @@ export class PrismaStudentRepository implements IStudentRepository {
     return student;
   }
 
-  async findByClassId(classId: string): Promise<Student[]> {
+  async findByClassId(
+    classId: string,
+    options?: IStudentSearchOptions,
+  ): Promise<Student[]> {
+    const { search } = options || {};
+
+    const whereClause: any = { classId };
+
+    if (search) {
+      whereClause.OR = [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          registration: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ];
+    }
+
     const students = await this.prisma.student.findMany({
-      where: { classId },
+      where: whereClause,
       orderBy: {
         name: 'asc',
       },
@@ -59,9 +83,11 @@ export class PrismaStudentRepository implements IStudentRepository {
   }
 
   async update(id: string, studentData: Partial<Student>): Promise<Student> {
+    const { classId, ...updateData } = studentData;
+
     const updatedStudent = await this.prisma.student.update({
       where: { id },
-      data: studentData,
+      data: updateData,
     });
 
     return updatedStudent;

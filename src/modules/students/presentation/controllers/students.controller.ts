@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -25,6 +26,7 @@ import { DeleteStudentUseCase } from '../../domain/usecases/delete-student.useca
 import { GetStudentUseCase } from '../../domain/usecases/get-student.usecase';
 import { ListStudentsByClassUseCase } from '../../domain/usecases/list-students-by-class.usecase';
 import { UpdateStudentUseCase } from '../../domain/usecases/update-student.usecase';
+import { StudentSearchQueryDto } from '../dto/student-search-query.dto';
 import { CreateStudentDto } from '../dtos/create-student.dto';
 import { StudentResponseDto } from '../dtos/student-response.dto';
 import { UpdateStudentDto } from '../dtos/update-student.dto';
@@ -82,11 +84,13 @@ export class StudentsController {
   async listByClass(
   @Param('classId') classId: string,
     @CurrentUser() currentUser: IJwtPayload,
+    @Query() query: StudentSearchQueryDto,
   ) {
-    const students = await this.listStudentsByClassUseCase.execute(
+    const students = await this.listStudentsByClassUseCase.execute({
       classId,
-      currentUser.sub,
-    );
+      teacherId: currentUser.sub,
+      ...query,
+    });
 
     return students;
   }

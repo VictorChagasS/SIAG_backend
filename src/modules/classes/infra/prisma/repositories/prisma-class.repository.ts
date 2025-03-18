@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { IPaginatedResult, IPaginationNamePeriodSearchOptions } from '@/common/interfaces/pagination.interfaces';
 import { Class } from '@/modules/classes/domain/entities/class.entity';
 import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -48,18 +49,46 @@ export class PrismaClassRepository implements IClassRepository {
     };
   }
 
-  async findByTeacherId(teacherId: string): Promise<Class[]> {
-    const classes = await this.prisma.class.findMany({
-      where: { teacherId },
-      include: {
-        // eslint-disable-next-line no-underscore-dangle
-        _count: {
-          select: { students: true },
-        },
-      },
-    });
+  async findByTeacherId(
+    teacherId: string,
+    options?: IPaginationNamePeriodSearchOptions,
+  ): Promise<IPaginatedResult<Class>> {
+    const {
+      page = 1, limit = 10, name, period,
+    } = options || {};
+    const skip = (page - 1) * limit;
 
-    return classes.map((classItem) => {
+    const whereClause: any = { teacherId };
+
+    if (name) {
+      whereClause.name = {
+        contains: name,
+        mode: 'insensitive',
+      };
+    }
+
+    if (period) {
+      whereClause.period = period;
+    }
+
+    const [classes, total] = await Promise.all([
+      this.prisma.class.findMany({
+        where: whereClause,
+        include: {
+          // eslint-disable-next-line no-underscore-dangle
+          _count: {
+            select: { students: true },
+          },
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.class.count({
+        where: whereClause,
+      }),
+    ]);
+
+    const data = classes.map((classItem) => {
       // eslint-disable-next-line no-underscore-dangle
       const { _count, ...classData } = classItem;
       return {
@@ -68,19 +97,33 @@ export class PrismaClassRepository implements IClassRepository {
         studentCount: _count.students,
       };
     });
+
+    return {
+      data,
+      total,
+    };
   }
 
-  async findActiveByTeacherId(teacherId: string): Promise<Class[]> {
+  async findActiveByTeacherId(teacherId: string, name?: string): Promise<Class[]> {
     const user = await this.prisma.user.findUnique({
       where: { id: teacherId },
       select: { currentPeriod: true },
     });
 
+    const whereClause: any = {
+      teacherId,
+      period: user?.currentPeriod,
+    };
+
+    if (name) {
+      whereClause.name = {
+        contains: name,
+        mode: 'insensitive',
+      };
+    }
+
     const classes = await this.prisma.class.findMany({
-      where: {
-        teacherId,
-        period: user?.currentPeriod,
-      },
+      where: whereClause,
       include: {
         // eslint-disable-next-line no-underscore-dangle
         _count: {

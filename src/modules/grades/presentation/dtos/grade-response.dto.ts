@@ -46,4 +46,4 @@ export class GradeResponseDto {
     example: '2023-01-15T14:30:00.000Z',
   })
     updatedAt: Date;
-} 
+}

@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res,
+  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth, ApiTags, ApiOperation, ApiParam,
@@ -25,6 +25,10 @@ import { ClassResponseDto } from '@/modules/classes/presentation/dtos/class-resp
 import { CreateClassDto } from '@/modules/classes/presentation/dtos/create-class.dto';
 import { UpdateClassFormulaDto } from '@/modules/classes/presentation/dtos/update-class-formula.dto';
 import { UpdateClassDto } from '@/modules/classes/presentation/dtos/update-class.dto';
+
+import { ActiveTeacherClassesQueryDto } from '../dto/active-teacher-classes-query.dto';
+import { ListTeacherClassesQueryDto } from '../dto/list-teacher-classes-query.dto';
+import { PaginatedClassResponseDto } from '../dtos/paginated-class-response.dto';
 
 @ApiTags('classes')
 @Controller('classes')
@@ -133,11 +137,17 @@ export class ClassesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Listar turmas do professor', description: 'Lista todas as turmas do professor atual' })
-  @ApiResponseWrapped(ClassResponseDto, true)
-  async findAllByTeacher(@CurrentUser() currentUser: IJwtPayload) {
-    const classes = await this.listTeacherClassesUseCase.execute(currentUser.sub);
+  @ApiResponseWrapped(PaginatedClassResponseDto)
+  async findAllByTeacher(
+  @CurrentUser() currentUser: IJwtPayload,
+    @Query() query: ListTeacherClassesQueryDto,
+  ) {
+    const result = await this.listTeacherClassesUseCase.execute({
+      teacherId: currentUser.sub,
+      ...query,
+    });
 
-    return classes;
+    return result;
   }
 
   @Get('my-classes/active')
@@ -145,8 +155,14 @@ export class ClassesController {
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Listar turmas ativas do professor', description: 'Lista todas as turmas ativas do professor atual' })
   @ApiResponseWrapped(ClassResponseDto, true)
-  async findAllActiveByTeacher(@CurrentUser() currentUser: IJwtPayload) {
-    const classes = await this.listActiveTeacherClassesUseCase.execute(currentUser.sub);
+  async findAllActiveByTeacher(
+  @CurrentUser() currentUser: IJwtPayload,
+    @Query() query: ActiveTeacherClassesQueryDto,
+  ) {
+    const classes = await this.listActiveTeacherClassesUseCase.execute({
+      teacherId: currentUser.sub,
+      ...query,
+    });
 
     return classes;
   }
