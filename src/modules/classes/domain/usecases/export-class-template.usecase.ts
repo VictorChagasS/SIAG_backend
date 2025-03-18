@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 
+import { CalculateAllAveragesUseCase } from '@/modules/grades/domain/usecases/calculate-all-averages.usecase';
+
 import { CLASS_REPOSITORY } from '../../classes.providers';
 import { IClassRepository } from '../repositories/class-repository.interface';
-
-import { CalculateAllAveragesUseCase } from '@/modules/grades/domain/usecases/calculate-all-averages.usecase';
 
 @Injectable()
 export class ExportClassTemplateUseCase {
