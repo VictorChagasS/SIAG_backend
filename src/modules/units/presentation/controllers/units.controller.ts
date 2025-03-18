@@ -1,3 +1,13 @@
+/**
+ * Units Controller
+ *
+ * Controller responsible for handling HTTP requests related to units management.
+ * Units are subdivisions of classes (like bimesters or trimesters) that contain
+ * evaluation items and grades.
+ *
+ * @module UnitsController
+ * @units Presentation
+ */
 import {
   Body,
   Controller,
@@ -36,7 +46,34 @@ import { UpsertUnitDto } from '../dtos/upsert-unit.dto';
 
 @ApiTags('units')
 @Controller('units')
+/**
+ * Controller for handling unit-related HTTP requests
+ *
+ * Provides endpoints for unit management operations including:
+ * - Creating, reading, updating, and deleting units
+ * - Upserting units (create or update)
+ * - Managing unit grade formulas
+ * - Listing units for a specific class
+ *
+ * All operations include authorization checks to ensure only teachers
+ * that own a class can modify its units.
+ *
+ * @class UnitsController
+ * @units Controller
+ */
 export class UnitsController {
+  /**
+   * Creates a UnitsController instance with injected use cases
+   *
+   * @param {CreateUnitUseCase} createUnitUseCase - Use case for creating units
+   * @param {GetUnitUseCase} getUnitUseCase - Use case for retrieving a single unit
+   * @param {ListUnitsByClassUseCase} listUnitsByClassUseCase - Use case for listing a class's units
+   * @param {UpdateUnitUseCase} updateUnitUseCase - Use case for updating unit details
+   * @param {DeleteUnitUseCase} deleteUnitUseCase - Use case for deleting units
+   * @param {UpsertUnitUseCase} upsertUnitUseCase - Use case for upserting units
+   * @param {UpdateUnitFormulaUseCase} updateUnitFormulaUseCase - Use case for updating unit formulas
+   * @units Constructor
+   */
   constructor(
     private createUnitUseCase: CreateUnitUseCase,
     private getUnitUseCase: GetUnitUseCase,
@@ -47,6 +84,15 @@ export class UnitsController {
     private updateUnitFormulaUseCase: UpdateUnitFormulaUseCase,
   ) {}
 
+  /**
+   * Creates a new unit for a class
+   *
+   * @param {string} classId - ID of the class to add the unit to
+   * @param {CreateUnitDto} createUnitDto - Unit data for creation
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit>} The created unit
+   * @units Create
+   */
   @Post(':classId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -74,6 +120,15 @@ export class UnitsController {
     return unitCreated;
   }
 
+  /**
+   * Creates a new unit or updates an existing one with the same name
+   *
+   * @param {string} classId - ID of the class to add/update the unit
+   * @param {UpsertUnitDto} upsertUnitDto - Unit data for creation/update
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit>} The created or updated unit
+   * @units Upsert
+   */
   @Put(':classId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -101,6 +156,14 @@ export class UnitsController {
     return unit;
   }
 
+  /**
+   * Lists all units for a specific class
+   *
+   * @param {string} classId - ID of the class to list units from
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit[]>} Array of units for the class
+   * @units Read
+   */
   @Get(':classId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -124,6 +187,15 @@ export class UnitsController {
     return units;
   }
 
+  /**
+   * Gets a single unit by ID
+   *
+   * @param {string} classId - ID of the class (used for route structuring)
+   * @param {string} id - ID of the unit to retrieve
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit>} The requested unit
+   * @units Read
+   */
   @Get(':classId/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -146,6 +218,16 @@ export class UnitsController {
     return unit;
   }
 
+  /**
+   * Updates a unit's information
+   *
+   * @param {string} classId - ID of the class (used for route structuring)
+   * @param {string} id - ID of the unit to update
+   * @param {UpdateUnitDto} updateUnitDto - The data to update
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit>} The updated unit
+   * @units Update
+   */
   @Patch(':classId/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -174,6 +256,16 @@ export class UnitsController {
     return updatedUnit;
   }
 
+  /**
+   * Updates a unit's grade calculation formula
+   *
+   * @param {string} classId - ID of the class (used for route structuring)
+   * @param {string} id - ID of the unit to update
+   * @param {UpdateUnitFormulaDto} updateUnitFormulaDto - The formula data to update
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit>} The updated unit
+   * @units Formula
+   */
   @Patch(':classId/:id/formula')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -202,6 +294,15 @@ export class UnitsController {
     return updatedUnit;
   }
 
+  /**
+   * Deletes a unit
+   *
+   * @param {string} classId - ID of the class (used for route structuring)
+   * @param {string} id - ID of the unit to delete
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Unit>} The deleted unit
+   * @units Delete
+   */
   @Delete(':classId/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')

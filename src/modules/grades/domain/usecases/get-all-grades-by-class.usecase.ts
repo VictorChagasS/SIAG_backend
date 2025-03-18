@@ -1,3 +1,12 @@
+/**
+ * Get All Grades By Class Use Case
+ *
+ * Implements the business logic for retrieving all grades for students in a specific class.
+ * Aggregates grade data with student, evaluation item, and unit information.
+ *
+ * @module GradeUseCases
+ * @grades Domain
+ */
 import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
@@ -14,25 +23,105 @@ import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
 import { GRADE_REPOSITORY } from '../../grades.providers';
 import { IGradeRepository } from '../repositories/grade-repository.interface';
 
+/**
+ * Grade detail result with associated student, evaluation item, and unit information
+ *
+ * Contains comprehensive information about each grade, enriched with related entity data
+ * for easier consumption by the client
+ *
+ * @interface IGradeDetailResult
+ * @grades DTO
+ */
 interface IGradeDetailResult {
+  /**
+   * Unique identifier of the grade
+   */
   id: string;
+
+  /**
+   * Numeric value of the grade
+   */
   value: number;
+
+  /**
+   * Unique identifier of the student who received the grade
+   */
   studentId: string;
+
+  /**
+   * Display name of the student
+   */
   studentName: string;
+
+  /**
+   * Unique identifier of the evaluation item
+   */
   evaluationItemId: string;
+
+  /**
+   * Display name of the evaluation item
+   */
   evaluationItemName: string;
+
+  /**
+   * Unique identifier of the unit the evaluation item belongs to
+   */
   unitId: string;
+
+  /**
+   * Display name of the unit
+   */
   unitName: string;
 }
 
+/**
+ * Class grades result containing class information and all grades
+ *
+ * Provides a structured container for all grade details within a class
+ *
+ * @interface IClassGradesResult
+ * @grades DTO
+ */
 interface IClassGradesResult {
+  /**
+   * Unique identifier of the class
+   */
   classId: string;
+
+  /**
+   * Display name of the class
+   */
   className: string;
+
+  /**
+   * Collection of all grade details in the class
+   */
   grades: IGradeDetailResult[];
 }
 
+/**
+ * Service for retrieving all grades for students in a class
+ *
+ * Handles the business logic for comprehensive grade retrieval, including:
+ * - Permission validation
+ * - Aggregating data from multiple repositories
+ * - Enriching grade data with student, evaluation item, and unit information
+ *
+ * @class GetAllGradesByClassUseCase
+ * @grades UseCase
+ */
 @Injectable()
 export class GetAllGradesByClassUseCase {
+  /**
+   * Creates a use case instance with the required repositories
+   *
+   * @param {IGradeRepository} gradeRepository - Repository for grade data access
+   * @param {IUnitRepository} unitRepository - Repository for unit data access
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @param {IStudentRepository} studentRepository - Repository for student data access
+   * @param {IEvaluationItemRepository} evaluationItemRepository - Repository for evaluation item data access
+   * @grades Constructor
+   */
   constructor(
     @Inject(GRADE_REPOSITORY)
     private gradeRepository: IGradeRepository,
@@ -46,6 +135,16 @@ export class GetAllGradesByClassUseCase {
     private evaluationItemRepository: IEvaluationItemRepository,
   ) {}
 
+  /**
+   * Retrieves all grades for a class with rich contextual information
+   *
+   * @param {string} classId - ID of the class to retrieve grades for
+   * @param {string} teacherId - ID of the teacher (for permission validation)
+   * @returns {Promise<IClassGradesResult>} Comprehensive class grades information
+   * @throws {NotFoundException} If the class is not found
+   * @throws {ForbiddenException} If the teacher doesn't own the class
+   * @grades Execute
+   */
   async execute(classId: string, teacherId: string): Promise<IClassGradesResult> {
     // Verificar se a turma existe
     const classEntity = await this.classRepository.findById(classId);

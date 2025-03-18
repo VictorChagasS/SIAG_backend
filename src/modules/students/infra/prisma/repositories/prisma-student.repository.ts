@@ -1,3 +1,12 @@
+/**
+ * Prisma Student Repository
+ *
+ * Implementation of the Student Repository interface using Prisma ORM
+ * for database operations.
+ *
+ * @module StudentRepositories
+ * @students Infrastructure
+ */
 import { Injectable } from '@nestjs/common';
 
 import { Student } from '@/modules/students/domain/entities/student.entity';
@@ -10,9 +19,16 @@ import { PrismaService } from '@/prisma/prisma.service';
  *
  * @class PrismaStudentRepository
  * @implements {IStudentRepository}
+ * @students Repository
  */
 @Injectable()
 export class PrismaStudentRepository implements IStudentRepository {
+  /**
+   * Creates a repository instance with Prisma service
+   *
+   * @param {PrismaService} prisma - Injected Prisma service
+   * @students Constructor
+   */
   constructor(private prisma: PrismaService) {}
 
   /**
@@ -20,6 +36,7 @@ export class PrismaStudentRepository implements IStudentRepository {
    *
    * @param {Student} studentData - The student data to create
    * @returns {Promise<Student>} The created student
+   * @students Create
    */
   async create(studentData: Student): Promise<Student> {
     const createdStudent = await this.prisma.student.create({
@@ -39,6 +56,7 @@ export class PrismaStudentRepository implements IStudentRepository {
    *
    * @param {string} id - The student ID
    * @returns {Promise<Student | null>} The student if found, null otherwise
+   * @students Read
    */
   async findById(id: string): Promise<Student | null> {
     const student = await this.prisma.student.findUnique({
@@ -57,6 +75,7 @@ export class PrismaStudentRepository implements IStudentRepository {
    * @param {string} classId - The class ID to search students for
    * @param {IStudentSearchOptions} [options] - Optional search parameters
    * @returns {Promise<Student[]>} Array of students matching the criteria
+   * @students Read
    */
   async findByClassId(
     classId: string,
@@ -99,6 +118,7 @@ export class PrismaStudentRepository implements IStudentRepository {
    * @param {string} registration - The registration number to search for
    * @param {string} classId - The class ID to search in
    * @returns {Promise<Student | null>} The student if found, null otherwise
+   * @students Read
    */
   async findByRegistrationAndClassId(
     registration: string,
@@ -122,6 +142,7 @@ export class PrismaStudentRepository implements IStudentRepository {
    * @param {string} id - The student ID to update
    * @param {Partial<Student>} studentData - The data to update
    * @returns {Promise<Student>} The updated student
+   * @students Update
    */
   async update(id: string, studentData: Partial<Student>): Promise<Student> {
     const { classId, ...updateData } = studentData;
@@ -139,6 +160,7 @@ export class PrismaStudentRepository implements IStudentRepository {
    *
    * @param {string} id - The student ID to delete
    * @returns {Promise<void>}
+   * @students Delete
    */
   async delete(id: string): Promise<void> {
     await this.prisma.student.delete({

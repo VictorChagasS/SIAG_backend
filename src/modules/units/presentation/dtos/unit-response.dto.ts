@@ -1,5 +1,21 @@
+/**
+ * Unit Response DTO
+ *
+ * Data Transfer Object for unit responses returned by API endpoints.
+ * Includes all the information about a unit.
+ *
+ * @module UnitDTOs
+ */
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * DTO for unit data responses
+ *
+ * Contains the complete representation of a unit as returned by the API,
+ * including its identifier, properties, formula settings, and timestamps.
+ *
+ * @class UnitResponseDto
+ */
 export class UnitResponseDto {
   @ApiProperty({
     description: 'ID único da unidade',

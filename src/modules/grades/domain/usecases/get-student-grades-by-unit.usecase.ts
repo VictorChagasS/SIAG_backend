@@ -1,3 +1,12 @@
+/**
+ * Get Student Grades by Unit Use Case
+ *
+ * Implements the business logic for retrieving all grades for a specific student within a unit.
+ * Validates permissions and relationships between student, unit, and class.
+ *
+ * @module GradeUseCases
+ * @grades Domain
+ */
 import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
@@ -13,8 +22,30 @@ import { GRADE_REPOSITORY } from '../../grades.providers';
 import { Grade } from '../entities/grade.entity';
 import { IGradeRepository } from '../repositories/grade-repository.interface';
 
+/**
+ * Service for retrieving all grades for a specific student within a unit
+ *
+ * Handles the business logic for student-specific unit grades retrieval, including:
+ * - Validation that the unit exists
+ * - Validation that the class exists
+ * - Validation that the student exists
+ * - Validation that the student belongs to the class
+ * - Permission checking (only class owner can view grades)
+ *
+ * @class GetStudentGradesByUnitUseCase
+ * @grades UseCase
+ */
 @Injectable()
 export class GetStudentGradesByUnitUseCase {
+  /**
+   * Creates a use case instance with the required repositories
+   *
+   * @param {IGradeRepository} gradeRepository - Repository for grade data access
+   * @param {IUnitRepository} unitRepository - Repository for unit data access
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @param {IStudentRepository} studentRepository - Repository for student data access
+   * @grades Constructor
+   */
   constructor(
     @Inject(GRADE_REPOSITORY)
     private gradeRepository: IGradeRepository,
@@ -26,6 +57,17 @@ export class GetStudentGradesByUnitUseCase {
     private studentRepository: IStudentRepository,
   ) {}
 
+  /**
+   * Retrieves all grades for a student within a unit if the teacher has permission
+   *
+   * @param {string} unitId - The ID of the unit to retrieve grades for
+   * @param {string} studentId - The ID of the student to retrieve grades for
+   * @param {string} teacherId - ID of the teacher requesting the grades
+   * @returns {Promise<Grade[]>} Array of grades for the specified student and unit
+   * @throws {NotFoundException} If the unit, class, or student is not found
+   * @throws {ForbiddenException} If the teacher doesn't own the class or the student doesn't belong to the class
+   * @grades Execute
+   */
   async execute(unitId: string, studentId: string, teacherId: string): Promise<Grade[]> {
     // Verificar se a unidade existe
     const unit = await this.unitRepository.findById(unitId);

@@ -1,3 +1,13 @@
+/**
+ * Students Controller
+ *
+ * Controller responsible for handling HTTP requests related to students management.
+ * Provides endpoints for creating, retrieving, updating, and deleting students,
+ * as well as listing students for a specific class.
+ *
+ * @module StudentsController
+ * @students Presentation
+ */
 import {
   Body,
   Controller,
@@ -33,7 +43,30 @@ import { UpdateStudentDto } from '../dtos/update-student.dto';
 
 @ApiTags('students')
 @Controller('students')
+/**
+ * Controller for handling student-related HTTP requests
+ *
+ * Provides endpoints for student management operations including:
+ * - Creating, reading, updating, and deleting students
+ * - Listing students for a specific class with search capabilities
+ *
+ * All operations include authorization checks to ensure only teachers
+ * that own a class can modify its students.
+ *
+ * @class StudentsController
+ * @students Controller
+ */
 export class StudentsController {
+  /**
+   * Creates a StudentsController instance with injected use cases
+   *
+   * @param {CreateStudentUseCase} createStudentUseCase - Use case for creating students
+   * @param {GetStudentUseCase} getStudentUseCase - Use case for retrieving a single student
+   * @param {ListStudentsByClassUseCase} listStudentsByClassUseCase - Use case for listing a class's students
+   * @param {UpdateStudentUseCase} updateStudentUseCase - Use case for updating student details
+   * @param {DeleteStudentUseCase} deleteStudentUseCase - Use case for deleting students
+   * @students Constructor
+   */
   constructor(
     private createStudentUseCase: CreateStudentUseCase,
     private getStudentUseCase: GetStudentUseCase,
@@ -42,6 +75,15 @@ export class StudentsController {
     private deleteStudentUseCase: DeleteStudentUseCase,
   ) {}
 
+  /**
+   * Creates a new student for a class
+   *
+   * @param {string} classId - ID of the class to add the student to
+   * @param {CreateStudentDto} createStudentDto - Student data for creation
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Student>} The created student
+   * @students Create
+   */
   @Post(':classId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -81,6 +123,15 @@ export class StudentsController {
   @ApiResponseWrapped(StudentResponseDto, true)
   @ApiErrorResponse(403, 'Você não tem permissão para listar estudantes desta turma', 'FORBIDDEN', 'Acesso negado')
   @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
+  /**
+   * Lists all students for a specific class
+   *
+   * @param {string} classId - ID of the class to list students from
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @param {StudentSearchQueryDto} query - Search parameters for filtering students
+   * @returns {Promise<Student[]>} Array of students for the class
+   * @students Read
+   */
   async listByClass(
   @Param('classId') classId: string,
     @CurrentUser() currentUser: IJwtPayload,
@@ -105,6 +156,13 @@ export class StudentsController {
   @ApiParam({ name: 'id', description: 'ID do estudante' })
   @ApiResponseWrapped(StudentResponseDto)
   @ApiErrorResponse(404, 'Estudante não encontrado', 'NOT_FOUND', 'Recurso não encontrado')
+  /**
+   * Gets a single student by ID
+   *
+   * @param {string} id - ID of the student to retrieve
+   * @returns {Promise<Student>} The requested student
+   * @students Read
+   */
   async getById(
   @Param('id') id: string,
   ) {
@@ -125,6 +183,15 @@ export class StudentsController {
   @ApiErrorResponse(403, 'Você não tem permissão para atualizar este estudante', 'FORBIDDEN', 'Acesso negado')
   @ApiErrorResponse(404, 'Estudante não encontrado', 'NOT_FOUND', 'Recurso não encontrado')
   @ApiErrorResponse(400, 'Dados inválidos', 'INVALID_DATA', 'Dados inválidos')
+  /**
+   * Updates a student's information
+   *
+   * @param {string} id - ID of the student to update
+   * @param {UpdateStudentDto} updateStudentDto - The data to update
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Student>} The updated student
+   * @students Update
+   */
   async update(
   @Param('id') id: string,
     @Body() updateStudentDto: UpdateStudentDto,
@@ -150,6 +217,14 @@ export class StudentsController {
   @ApiResponseWrapped(StudentResponseDto)
   @ApiErrorResponse(403, 'Você não tem permissão para remover este estudante', 'FORBIDDEN', 'Acesso negado')
   @ApiErrorResponse(404, 'Estudante não encontrado', 'NOT_FOUND', 'Recurso não encontrado')
+  /**
+   * Deletes a student
+   *
+   * @param {string} id - ID of the student to delete
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<Student>} The deleted student (before deletion)
+   * @students Delete
+   */
   async delete(
   @Param('id') id: string,
     @CurrentUser() currentUser: IJwtPayload,

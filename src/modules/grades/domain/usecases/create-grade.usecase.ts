@@ -1,3 +1,12 @@
+/**
+ * Create Grade Use Case
+ *
+ * Implements the business logic for creating a new grade for a student on a specific evaluation item.
+ * Validates permissions, student and evaluation item existence, and prevents duplicate grades.
+ *
+ * @module GradeUseCases
+ * @grades Domain
+ */
 import {
   Inject, Injectable, NotFoundException, ConflictException, ForbiddenException,
 } from '@nestjs/common';
@@ -15,16 +24,66 @@ import { GRADE_REPOSITORY } from '../../grades.providers';
 import { Grade } from '../entities/grade.entity';
 import { IGradeRepository } from '../repositories/grade-repository.interface';
 
+/**
+ * Data transfer object for creating a grade
+ *
+ * @interface ICreateGradeRequest
+ * @grades DTO
+ */
 interface ICreateGradeRequest {
+  /**
+   * ID of the student receiving the grade
+   */
   studentId: string;
+
+  /**
+   * ID of the evaluation item the grade belongs to
+   */
   evaluationItemId: string;
+
+  /**
+   * Numeric value of the grade
+   */
   value: number;
+
+  /**
+   * Optional comments about the grade
+   */
   comments?: string;
+
+  /**
+   * ID of the teacher creating the grade
+   * Used for permission validation
+   */
   teacherId: string;
 }
 
+/**
+ * Service for creating a new grade
+ *
+ * Handles the business logic for grade creation, including:
+ * - Validation that the evaluation item exists
+ * - Validation that the unit exists
+ * - Validation that the class exists
+ * - Permission checking (only class owner can create grades)
+ * - Validation that the student exists and belongs to the class
+ * - Ensuring no duplicate grades for the same student and evaluation item
+ *
+ * @class CreateGradeUseCase
+ * @grades UseCase
+ */
 @Injectable()
 export class CreateGradeUseCase {
+  /**
+   * Creates a use case instance with the required repositories
+   *
+   * @param {IGradeRepository} gradeRepository - Repository for grade data access
+   * @param {IEvaluationItemRepository} evaluationItemRepository - Repository for evaluation item data access
+   * @param {IStudentRepository} studentRepository - Repository for student data access
+   * @param {IUnitRepository} unitRepository - Repository for unit data access
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @grades Constructor
+   */
   constructor(
     @Inject(GRADE_REPOSITORY)
     private gradeRepository: IGradeRepository,
@@ -38,6 +97,16 @@ export class CreateGradeUseCase {
     private classRepository: IClassRepository,
   ) {}
 
+  /**
+   * Creates a new grade for a student on an evaluation item
+   *
+   * @param {ICreateGradeRequest} request - The data needed to create a grade
+   * @returns {Promise<Grade>} The newly created grade
+   * @throws {NotFoundException} If the evaluation item, unit, class, or student is not found
+   * @throws {ForbiddenException} If the teacher doesn't own the class or the student doesn't belong to the class
+   * @throws {ConflictException} If a grade already exists for this student and evaluation item
+   * @grades Execute
+   */
   async execute({
     studentId,
     evaluationItemId,

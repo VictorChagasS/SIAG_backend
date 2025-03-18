@@ -1,16 +1,44 @@
+/**
+ * Delete Unit Use Case
+ *
+ * Implements the business logic for deleting an existing unit.
+ * Validates permissions and handles unit deletion with cascading effects.
+ *
+ * @module UnitUseCases
+ * @units Domain
+ */
 import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
+
+import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
+import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 
 import { UNIT_REPOSITORY } from '../../units.providers';
 import { Unit } from '../entities/unit.entity';
 import { IUnitRepository } from '../repositories/unit-repository.interface';
 
-import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
-import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
-
+/**
+ * Service for deleting an existing unit
+ *
+ * Handles the business logic for unit deletion, including:
+ * - Validation that the unit exists
+ * - Validation that the class exists
+ * - Permission checking (only class owner can delete its units)
+ * - Cascading deletion of related evaluation items and grades
+ *
+ * @class DeleteUnitUseCase
+ * @units UseCase
+ */
 @Injectable()
 export class DeleteUnitUseCase {
+  /**
+   * Creates a DeleteUnitUseCase instance with required repositories
+   *
+   * @param {IUnitRepository} unitRepository - Repository for unit data access
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @units Constructor
+   */
   constructor(
     @Inject(UNIT_REPOSITORY)
     private unitRepository: IUnitRepository,
@@ -19,9 +47,16 @@ export class DeleteUnitUseCase {
   ) {}
 
   /**
-   * Exclui uma unidade e todos os seus itens avaliativos e notas relacionadas (em cascata).
-   * A exclusão em cascata é gerenciada pelo Prisma através da configuração onDelete: Cascade
-   * nas relações entre Unit -> EvaluationItem -> Grade.
+   * Deletes a unit and all its related evaluation items and grades (cascading).
+   * The cascade deletion is managed by Prisma through the onDelete: Cascade configuration
+   * in the relationships between Unit -> EvaluationItem -> Grade.
+   *
+   * @param {string} id - The ID of the unit to delete
+   * @param {string} teacherId - ID of the teacher requesting the deletion
+   * @returns {Promise<Unit>} The deleted unit (before deletion)
+   * @throws {NotFoundException} If the unit or class is not found
+   * @throws {ForbiddenException} If the teacher doesn't own the class
+   * @units Execute
    */
   async execute(id: string, teacherId: string): Promise<Unit> {
     // Verificar se a unidade existe

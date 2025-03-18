@@ -1,3 +1,13 @@
+/**
+ * Units Module
+ *
+ * Module responsible for handling units (academic periods or evaluation blocks) within classes.
+ * Units are subdivisions of a class, like bimesters or trimesters, each with its own
+ * evaluation items and grade calculation formula.
+ *
+ * @module UnitsModule
+ * @units Module
+ */
 import { Module, forwardRef } from '@nestjs/common';
 
 import { AuthModule } from '@/modules/auth/auth.module';
@@ -16,6 +26,16 @@ import { PrismaUnitRepository } from './infra/prisma/repositories/prisma-unit.re
 import { UnitsController } from './presentation/controllers/units.controller';
 import { UNIT_REPOSITORY } from './units.providers';
 
+/**
+ * Module for managing units within classes
+ *
+ * This module provides functionality to create, read, update, and delete units,
+ * along with specialized operations such as updating formulas and upserting units.
+ * It also manages the relationships between units, classes, and evaluation items.
+ *
+ * @class UnitsModule
+ * @units NestModule
+ */
 @Module({
   imports: [
     PrismaModule,

@@ -13,11 +13,25 @@ import { UNIT_REPOSITORY } from '../../units.providers';
 import { Unit } from '../entities/unit.entity';
 import { IUnitRepository } from '../repositories/unit-repository.interface';
 
+/**
+ * Data Transfer Object for updating a unit's formula
+ *
+ * @interface IUpdateUnitFormulaDTO
+ */
 export interface IUpdateUnitFormulaDTO {
   formula?: string;
   typeFormula?: ITypeFormula;
 }
 
+/**
+ * Use case for updating a unit's formula
+ *
+ * @class UpdateUnitFormulaUseCase
+ ***
+ * Use case for updating a unit's formula
+ *
+ * @class UpdateUnitFormulaUseCase
+ */
 @Injectable()
 export class UpdateUnitFormulaUseCase {
   constructor(
@@ -30,19 +44,19 @@ export class UpdateUnitFormulaUseCase {
   ) {}
 
   async execute(id: string, data: IUpdateUnitFormulaDTO, teacherId: string): Promise<Unit> {
-    // Verificar se a unidade existe
+    // validate if unit exists
     const unit = await this.unitRepository.findById(id);
     if (!unit) {
       throw new NotFoundException('Unidade não encontrada');
     }
 
-    // Verificar se a turma existe
+    // validate if class exists
     const classExists = await this.classRepository.findById(unit.classId);
     if (!classExists) {
       throw new NotFoundException('Turma não encontrada');
     }
 
-    // Verificar se o professor é o dono da turma
+    // validate if teacher is the owner of the class
     if (classExists.teacherId !== teacherId) {
       throw new ForbiddenException(
         'Você não tem permissão para atualizar esta unidade',
@@ -51,27 +65,27 @@ export class UpdateUnitFormulaUseCase {
 
     const formula = data.formula || '';
 
-    // Determinar o tipo de fórmula com base na entrada ou usar o valor fornecido
+    // determine the formula type based on the input or use the provided value
     const typeFormula = data.typeFormula || (formula && formula.trim() !== '' ? 'personalized' : 'simple');
 
     if (typeFormula === 'personalized') {
-      // Validar se a fórmula foi fornecida
+      // validate if the formula was provided
       if (!formula || formula.trim() === '') {
         throw new BadRequestException('Para fórmulas personalizadas, é necessário fornecer a fórmula.');
       }
 
-      // Buscar as avaliações da unidade para validar a fórmula
+      // search for the evaluations of the unit to validate the formula
       const evaluations = await this.evaluationItemRepository.findByUnitId(id);
 
       if (evaluations.length === 0) {
         throw new BadRequestException('Não é possível definir uma fórmula personalizada sem avaliações. Crie pelo menos uma avaliação primeiro.');
       }
 
-      // Validar se a fórmula respeita a quantidade de avaliações e é uma expressão matemática válida
+      // validate if the formula respects the number of evaluations and is a valid mathematical expression
       validatePersonalizedFormula(formula, evaluations.length);
     }
 
-    // Atualizar a fórmula de cálculo e o tipo de fórmula
+    // update the calculation formula and the formula type
     return this.unitRepository.update(id, {
       averageFormula: formula,
       typeFormula,

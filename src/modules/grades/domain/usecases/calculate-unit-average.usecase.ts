@@ -1,3 +1,12 @@
+/**
+ * Calculate Unit Average Use Case
+ *
+ * Implements the business logic for calculating a student's average grade within a specific unit.
+ * Supports both simple arithmetic averages and personalized formula calculations.
+ *
+ * @module GradeUseCases
+ * @grades Domain
+ */
 import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
@@ -14,6 +23,14 @@ import { UNIT_REPOSITORY } from '@/modules/units/units.providers';
 import { GRADE_REPOSITORY } from '../../grades.providers';
 import { IGradeRepository } from '../repositories/grade-repository.interface';
 
+/**
+ * Unit average calculation result with detailed grade breakdown
+ *
+ * Contains student and unit information, calculated average, and individual grades
+ *
+ * @interface IUnitAverageResult
+ * @grades DTO
+ */
 interface IUnitAverageResult {
   studentId: string;
   studentName: string;
@@ -27,8 +44,30 @@ interface IUnitAverageResult {
   }>;
 }
 
+/**
+ * Service for calculating a student's average grade within a specific unit
+ *
+ * Handles the business logic for unit average calculation, including:
+ * - Simple arithmetic averages
+ * - Personalized formula-based calculations
+ * - Permission validation
+ * - Student, unit, and class relationship verification
+ *
+ * @class CalculateUnitAverageUseCase
+ * @grades UseCase
+ */
 @Injectable()
 export class CalculateUnitAverageUseCase {
+  /**
+   * Creates a use case instance with the required repositories
+   *
+   * @param {IGradeRepository} gradeRepository - Repository for grade data access
+   * @param {IUnitRepository} unitRepository - Repository for unit data access
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @param {IStudentRepository} studentRepository - Repository for student data access
+   * @param {IEvaluationItemRepository} evaluationItemRepository - Repository for evaluation item data access
+   * @grades Constructor
+   */
   constructor(
     @Inject(GRADE_REPOSITORY)
     private gradeRepository: IGradeRepository,
@@ -42,6 +81,18 @@ export class CalculateUnitAverageUseCase {
     private evaluationItemRepository: IEvaluationItemRepository,
   ) {}
 
+  /**
+   * Calculates a student's average grade within a specific unit
+   *
+   * @param {string} unitId - ID of the unit to calculate average for
+   * @param {string} studentId - ID of the student
+   * @param {string} teacherId - ID of the teacher (for permission validation)
+   * @returns {Promise<IUnitAverageResult>} The calculated unit average result with grade breakdown
+   * @throws {NotFoundException} If the unit, class, student, or evaluation items are not found
+   * @throws {ForbiddenException} If the teacher doesn't own the class or the student doesn't belong to the class
+   * @throws {Error} If there's an error evaluating personalized formulas
+   * @grades Execute
+   */
   async execute(unitId: string, studentId: string, teacherId: string): Promise<IUnitAverageResult> {
     // Verificar se a unidade existe
     const unit = await this.unitRepository.findById(unitId);

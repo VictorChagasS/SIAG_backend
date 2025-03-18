@@ -1,3 +1,12 @@
+/**
+ * List Students by Class Use Case
+ *
+ * Implements the business logic for retrieving all students belonging to a specific class.
+ * Validates permissions, handles optional search filtering, and calculates student averages.
+ *
+ * @module StudentUseCases
+ * @students Domain
+ */
 import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
@@ -17,6 +26,7 @@ import { IStudentWithAverage } from '../types/student.types';
  * @property {string} classId - ID of the class to list students from
  * @property {string} teacherId - ID of the teacher making the request (for authorization)
  * @property {string} [search] - Optional search term to filter students by name or registration
+ * @students DTO
  */
 export interface IListStudentsByClassParams {
   /** ID of the class to list students from */
@@ -32,9 +42,18 @@ export interface IListStudentsByClassParams {
  * Includes authorization checks and calculation of student averages
  *
  * @class ListStudentsByClassUseCase
+ * @students UseCase
  */
 @Injectable()
 export class ListStudentsByClassUseCase {
+  /**
+   * Creates a ListStudentsByClassUseCase instance with required dependencies
+   *
+   * @param {IStudentRepository} studentRepository - Repository for student data access
+   * @param {IClassRepository} classRepository - Repository for class data access
+   * @param {CalculateStudentAverageUseCase} calculateStudentAverageUseCase - Service for calculating student averages
+   * @students Constructor
+   */
   constructor(
     @Inject(STUDENT_REPOSITORY)
     private studentRepository: IStudentRepository,
@@ -54,6 +73,7 @@ export class ListStudentsByClassUseCase {
    *
    * @throws {NotFoundException} If the class doesn't exist
    * @throws {ForbiddenException} If the teacher is not authorized to view the class
+   * @students Execute
    */
   async execute({
     classId,

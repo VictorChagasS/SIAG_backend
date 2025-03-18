@@ -2,12 +2,12 @@ import {
   Inject, Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 
+import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
+import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
+
 import { UNIT_REPOSITORY } from '../../units.providers';
 import { Unit } from '../entities/unit.entity';
 import { IUnitRepository } from '../repositories/unit-repository.interface';
-
-import { CLASS_REPOSITORY } from '@/modules/classes/classes.providers';
-import { IClassRepository } from '@/modules/classes/domain/repositories/class-repository.interface';
 
 export interface IUpsertUnitDTO {
   name: string;

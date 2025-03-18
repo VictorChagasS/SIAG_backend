@@ -1,3 +1,13 @@
+/**
+ * Evaluation Items Controller
+ *
+ * Handles HTTP requests related to evaluation items management.
+ * Provides endpoints for creating, retrieving, updating, and deleting
+ * evaluation items within units.
+ *
+ * @module EvaluationItemsControllers
+ * @evaluation-items Presentation
+ */
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,
 } from '@nestjs/common';
@@ -22,9 +32,28 @@ import { CreateEvaluationItemDto } from '../dtos/create-evaluation-item.dto';
 import { EvaluationItemResponseDto } from '../dtos/evaluation-item-response.dto';
 import { UpdateEvaluationItemDto } from '../dtos/update-evaluation-item.dto';
 
+/**
+ * REST API controller for evaluation items operations
+ *
+ * Provides endpoints for CRUD operations on evaluation items.
+ * All endpoints require authentication and appropriate permissions.
+ *
+ * @class EvaluationItemsController
+ * @evaluation-items Controller
+ */
 @ApiTags('evaluation-items')
 @Controller('evaluation-items')
 export class EvaluationItemsController {
+  /**
+   * Creates a controller instance with required use cases
+   *
+   * @param {CreateEvaluationItemUseCase} createEvaluationItemUseCase - For creating new evaluation items
+   * @param {GetEvaluationItemUseCase} getEvaluationItemUseCase - For retrieving evaluation items
+   * @param {ListEvaluationItemsByUnitUseCase} listEvaluationItemsByUnitUseCase - For listing evaluation items by unit
+   * @param {UpdateEvaluationItemUseCase} updateEvaluationItemUseCase - For updating evaluation items
+   * @param {DeleteEvaluationItemUseCase} deleteEvaluationItemUseCase - For deleting evaluation items
+   * @evaluation-items Constructor
+   */
   constructor(
     private createEvaluationItemUseCase: CreateEvaluationItemUseCase,
     private getEvaluationItemUseCase: GetEvaluationItemUseCase,
@@ -33,6 +62,15 @@ export class EvaluationItemsController {
     private deleteEvaluationItemUseCase: DeleteEvaluationItemUseCase,
   ) {}
 
+  /**
+   * Creates a new evaluation item for a specific unit
+   *
+   * @param {string} unitId - The unit ID to create the evaluation item in
+   * @param {CreateEvaluationItemDto} createEvaluationItemDto - The evaluation item data
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<EvaluationItemResponseDto>} The created evaluation item
+   * @evaluation-items Create
+   */
   @Post(':unitId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -59,6 +97,14 @@ export class EvaluationItemsController {
     return evaluationItemCreated;
   }
 
+  /**
+   * Lists all evaluation items belonging to a specific unit
+   *
+   * @param {string} unitId - The unit ID to list evaluation items for
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<EvaluationItemResponseDto[]>} Array of evaluation items
+   * @evaluation-items Read
+   */
   @Get(':unitId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -82,6 +128,15 @@ export class EvaluationItemsController {
     return evaluationItems;
   }
 
+  /**
+   * Retrieves a specific evaluation item by its ID
+   *
+   * @param {string} unitId - The unit ID (used for routing purposes)
+   * @param {string} id - The evaluation item ID to retrieve
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<EvaluationItemResponseDto>} The requested evaluation item
+   * @evaluation-items Read
+   */
   @Get(':unitId/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -104,6 +159,16 @@ export class EvaluationItemsController {
     return evaluationItem;
   }
 
+  /**
+   * Updates an existing evaluation item
+   *
+   * @param {string} unitId - The unit ID (used for routing purposes)
+   * @param {string} id - The evaluation item ID to update
+   * @param {UpdateEvaluationItemDto} updateEvaluationItemDto - The data to update
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<EvaluationItemResponseDto>} The updated evaluation item
+   * @evaluation-items Update
+   */
   @Patch(':unitId/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
@@ -132,6 +197,15 @@ export class EvaluationItemsController {
     return updatedEvaluationItem;
   }
 
+  /**
+   * Deletes an existing evaluation item
+   *
+   * @param {string} unitId - The unit ID (used for routing purposes)
+   * @param {string} id - The evaluation item ID to delete
+   * @param {IJwtPayload} currentUser - The authenticated user
+   * @returns {Promise<EvaluationItemResponseDto>} The deleted evaluation item
+   * @evaluation-items Delete
+   */
   @Delete(':unitId/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')

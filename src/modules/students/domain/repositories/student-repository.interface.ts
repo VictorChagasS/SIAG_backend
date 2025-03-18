@@ -1,3 +1,12 @@
+/**
+ * Student Repository Interface
+ *
+ * Defines the contract for student data access operations that must be implemented
+ * by any concrete student repository implementation.
+ *
+ * @module StudentRepositories
+ * @students Domain
+ */
 import { Student } from '../entities/student.entity';
 
 /**
@@ -5,10 +14,13 @@ import { Student } from '../entities/student.entity';
  *
  * @interface IStudentSearchOptions
  * @property {string} [search] - Search term to filter students by name or registration number
+ * @students SearchOptions
  */
 export interface IStudentSearchOptions {
   /**
    * Search term to filter students by name or registration number
+   *
+   * @students Property
    */
   search?: string;
 }
@@ -17,6 +29,7 @@ export interface IStudentSearchOptions {
  * Repository interface for student-related database operations
  *
  * @interface IStudentRepository
+ * @students Repository
  */
 export interface IStudentRepository {
   /**
@@ -24,6 +37,7 @@ export interface IStudentRepository {
    *
    * @param {Student} studentData - The student data to create
    * @returns {Promise<Student>} The created student
+   * @students Create
    */
   create(studentData: Student): Promise<Student>;
 
@@ -32,6 +46,7 @@ export interface IStudentRepository {
    *
    * @param {string} id - The student ID
    * @returns {Promise<Student | null>} The student if found, null otherwise
+   * @students Read
    */
   findById(id: string): Promise<Student | null>;
 
@@ -41,6 +56,7 @@ export interface IStudentRepository {
    * @param {string} classId - The class ID to search students for
    * @param {IStudentSearchOptions} [options] - Optional search parameters
    * @returns {Promise<Student[]>} Array of students matching the criteria
+   * @students Read
    */
   findByClassId(classId: string, options?: IStudentSearchOptions): Promise<Student[]>;
 
@@ -50,6 +66,7 @@ export interface IStudentRepository {
    * @param {string} registration - The registration number to search for
    * @param {string} classId - The class ID to search in
    * @returns {Promise<Student | null>} The student if found, null otherwise
+   * @students Read
    */
   findByRegistrationAndClassId(registration: string, classId: string): Promise<Student | null>;
 
@@ -59,6 +76,7 @@ export interface IStudentRepository {
    * @param {string} id - The student ID to update
    * @param {Partial<Student>} studentData - The data to update
    * @returns {Promise<Student>} The updated student
+   * @students Update
    */
   update(id: string, studentData: Partial<Student>): Promise<Student>;
 
@@ -67,6 +85,7 @@ export interface IStudentRepository {
    *
    * @param {string} id - The student ID to delete
    * @returns {Promise<void>}
+   * @students Delete
    */
   delete(id: string): Promise<void>;
 }

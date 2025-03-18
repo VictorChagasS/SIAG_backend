@@ -1,3 +1,13 @@
+/**
+ * Students Module
+ *
+ * Module responsible for handling student management.
+ * Provides functionality for creating, retrieving, updating, and deleting students,
+ * as well as listing students for a specific class.
+ *
+ * @module StudentsModule
+ * @students Module
+ */
 import { Module, forwardRef } from '@nestjs/common';
 
 import { AuthModule } from '@/modules/auth/auth.module';
@@ -14,6 +24,16 @@ import { PrismaStudentRepository } from './infra/prisma/repositories/prisma-stud
 import { StudentsController } from './presentation/controllers/students.controller';
 import { STUDENT_REPOSITORY } from './students.providers';
 
+/**
+ * Module for managing students
+ *
+ * This module provides functionality to create, read, update, and delete students,
+ * as well as listing students for specific classes. It also handles relationships
+ * between students, classes, and grades.
+ *
+ * @class StudentsModule
+ * @students NestModule
+ */
 @Module({
   imports: [
     PrismaModule,
