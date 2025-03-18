@@ -8,6 +8,10 @@ RUN npm install
 
 COPY . .
 
+# Gerar o Prisma Client
+RUN npx prisma generate
+
+# Compilar a aplicação
 RUN npm run build
 
 FROM node:18-alpine AS production
@@ -16,22 +20,27 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# Instalando ts-node globalmente
-RUN npm install -g ts-node typescript
+# Instalar apenas as dependências de produção
+RUN npm ci --only=production
 
-# Instalando dependências de produção
-RUN npm install --only=production
-
+# Copiar o código compilado, o Prisma schema e os scripts
 COPY --from=development /usr/src/app/dist ./dist
-COPY --from=development /usr/src/app/prisma ./prisma
-COPY --from=development /usr/src/app/src/scripts ./src/scripts
+COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+COPY prisma ./prisma
+COPY src/scripts ./src/scripts
+COPY entrypoint.sh ./entrypoint.sh
 
-# Gerando o Prisma Client
+# Gerar o Prisma Client novamente no ambiente de produção
 RUN npx prisma generate
 
-# Executando as migrações
-RUN npx prisma migrate deploy
+# Tornar o script de entrypoint executável
+RUN chmod +x ./entrypoint.sh
 
+# Expor a porta que a aplicação usa
 EXPOSE 3000
 
+# Definir o entrypoint
+ENTRYPOINT ["./entrypoint.sh"]
+
+# Iniciar a aplicação
 CMD ["node", "dist/main"] 
