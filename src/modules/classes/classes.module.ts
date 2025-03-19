@@ -17,6 +17,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { classesProviders } from '@/modules/classes/classes.providers';
 import { CreateClassUseCase } from '@/modules/classes/domain/usecases/create-class.usecase';
 import { DeleteClassUseCase } from '@/modules/classes/domain/usecases/delete-class.usecase';
+import { DownloadClassTemplateUseCase } from '@/modules/classes/domain/usecases/download-class-template.usecase';
 import { ExportClassTemplateUseCase } from '@/modules/classes/domain/usecases/export-class-template.usecase';
 import { GetClassUseCase } from '@/modules/classes/domain/usecases/get-class.usecase';
 import { ImportClassWithStudentsUseCase } from '@/modules/classes/domain/usecases/import-class-with-students.usecase';
@@ -71,6 +72,7 @@ import { UnitsModule } from '@/modules/units/units.module';
     DeleteClassUseCase,
     ImportClassWithStudentsUseCase,
     ExportClassTemplateUseCase,
+    DownloadClassTemplateUseCase,
     // Repository providers
     ...classesProviders,
   ],
@@ -83,6 +85,7 @@ import { UnitsModule } from '@/modules/units/units.module';
     ListTeacherClassesUseCase,
     ListActiveTeacherClassesUseCase,
     ExportClassTemplateUseCase,
+    DownloadClassTemplateUseCase,
   ],
 })
 export class ClassesModule {}

@@ -22,6 +22,7 @@ import { JwtAuthGuard } from '@/modules/auth/domain/guards/jwt-auth.guard';
 import { IJwtPayload } from '@/modules/auth/domain/types/jwt-payload.type';
 import { CreateClassUseCase } from '@/modules/classes/domain/usecases/create-class.usecase';
 import { DeleteClassUseCase } from '@/modules/classes/domain/usecases/delete-class.usecase';
+import { DownloadClassTemplateUseCase } from '@/modules/classes/domain/usecases/download-class-template.usecase';
 import { ExportClassTemplateUseCase } from '@/modules/classes/domain/usecases/export-class-template.usecase';
 import { GetClassUseCase } from '@/modules/classes/domain/usecases/get-class.usecase';
 import { ListActiveClassesUseCase } from '@/modules/classes/domain/usecases/list-active-classes.usecase';
@@ -64,7 +65,28 @@ export class ClassesController {
     private readonly updateClassFormulaUseCase: UpdateClassFormulaUseCase,
     private readonly deleteClassUseCase: DeleteClassUseCase,
     private readonly exportClassTemplateUseCase: ExportClassTemplateUseCase,
+    private readonly downloadClassTemplateUseCase: DownloadClassTemplateUseCase,
   ) {}
+
+  @Get('template')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Baixar template vazio',
+    description: 'Baixa um arquivo Excel com o template vazio para registro de notas',
+  })
+  @ApiErrorResponse(500, 'Erro ao processar arquivo de template', 'SERVER_ERROR', 'Erro interno')
+  async downloadTemplate(@Res() res: Response) {
+    const templateBuffer = await this.downloadClassTemplateUseCase.execute();
+
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="template.xlsx"',
+      'Content-Length': templateBuffer.length,
+    });
+
+    res.end(templateBuffer);
+  }
 
   @Get(':id/export')
   @UseGuards(JwtAuthGuard)
