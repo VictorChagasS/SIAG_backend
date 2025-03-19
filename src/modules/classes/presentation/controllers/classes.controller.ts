@@ -98,7 +98,7 @@ export class ClassesController {
   @ApiParam({ name: 'id', description: 'ID da turma' })
   @ApiErrorResponse(403, 'Você não tem permissão para exportar esta turma', 'FORBIDDEN', 'Acesso negado')
   @ApiErrorResponse(404, 'Turma não encontrada', 'NOT_FOUND', 'Recurso não encontrado')
-  @ApiErrorResponse(400, 'É necessário ter pelo menos 3 unidades para exportar o template', 'INVALID_DATA', 'Dados inválidos')
+  @ApiErrorResponse(400, 'É necessário ter pelo menos 3 unidades e 1 aluno para exportar a turma', 'INVALID_DATA', 'Dados inválidos')
   async exportTemplate(
   @Param('id') id: string,
     @CurrentUser() currentUser: IJwtPayload,

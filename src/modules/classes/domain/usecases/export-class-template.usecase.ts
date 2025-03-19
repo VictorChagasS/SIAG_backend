@@ -72,7 +72,7 @@ export class ExportClassTemplateUseCase {
     // Verificar se existem pelo menos 3 unidades
     const anyStudent = classAverages.studentAverages[0];
     if (!anyStudent || anyStudent.unitAverages.length < 3) {
-      throw new BadRequestException('É necessário ter pelo menos 3 unidades para exportar o template');
+      throw new BadRequestException('É necessário ter pelo menos 3 unidades e 10 alunos para exportar a turma');
     }
 
     // Caminho para o arquivo template.xlsx
