@@ -60,8 +60,8 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException({
         code: 'TOKEN_NOT_PROVIDED',
-        title: 'Token not provided',
-        detail: ['An authentication token is required'],
+        title: 'Token não fornecido',
+        detail: ['É necessário fornecer um token de autenticação'],
       });
     }
 
@@ -70,16 +70,16 @@ export class JwtAuthGuard implements CanActivate {
       if (!payload.sub || !payload.email) {
         throw new UnauthorizedException({
           code: 'INVALID_TOKEN_PAYLOAD',
-          title: 'Invalid token',
-          detail: ['The token does not contain all required information'],
+          title: 'Token inválido',
+          detail: ['O token não contém todas as informações necessárias'],
         });
       }
       request.user = payload;
     } catch (error) {
       throw new UnauthorizedException({
         code: 'INVALID_TOKEN',
-        title: 'Invalid token',
-        detail: ['The provided token is invalid or has expired'],
+        title: 'Token inválido',
+        detail: ['O token fornecido é inválido ou expirou'],
       });
     }
 
