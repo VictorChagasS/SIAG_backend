@@ -6,9 +6,9 @@
  *
  * @module ClassDTOs
  */
-import { ClassResponseDto } from './class-response.dto';
-
 import { PaginatedResponseDto } from '@/common/dtos/paginated-response.dto';
+
+import { ClassResponseDto } from './class-response.dto';
 
 /**
  * DTO for paginated class responses
