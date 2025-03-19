@@ -29,7 +29,7 @@ COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma
 COPY src/scripts ./src/scripts
 # Copiar arquivos estáticos necessários
-COPY src/shared ./src/shared
+COPY src/common ./src/common
 COPY entrypoint.sh ./entrypoint.sh
 
 # Gerar o Prisma Client novamente no ambiente de produção
