@@ -9,6 +9,39 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
+ * DTO for institution response
+ * @class InstitutionDto
+ */
+export class InstitutionDto {
+  /**
+   * Institution's unique identifier
+   */
+  @ApiProperty({
+    description: 'ID da instituição',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+    id: string;
+
+  /**
+   * Institution's full name
+   */
+  @ApiProperty({
+    description: 'Nome completo da instituição',
+    example: 'Universidade Federal da Paraíba',
+  })
+    name: string;
+
+  /**
+   * Institution's acronym
+   */
+  @ApiProperty({
+    description: 'Sigla da instituição',
+    example: 'UFPB',
+  })
+    acronym: string;
+}
+
+/**
  * DTO for user profile response
  *
  * Contains the complete user profile information, including
@@ -73,6 +106,15 @@ export class UserMeResponseDto {
     example: '1234',
   })
     institutionId: string;
+
+  /**
+   * User's associated institution details
+   */
+  @ApiProperty({
+    description: 'Dados completos da instituição do usuário',
+    type: InstitutionDto,
+  })
+    institution: InstitutionDto;
 
   /**
    * Timestamp of when the user account was created

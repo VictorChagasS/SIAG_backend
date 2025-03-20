@@ -18,7 +18,13 @@ import { CreateUserDto } from '@/modules/users/presentation/dtos/create-user.dto
 import { UpdateUserDto } from '@/modules/users/presentation/dtos/update-user.dto';
 import { UserSearchQueryDto } from '@/modules/users/presentation/dtos/user-search-query.dto';
 
+import { ResetPasswordUseCase } from '../../domain/usecases/reset-password.usecase';
+import { UpdateUserInfoUseCase } from '../../domain/usecases/update-user-info.usecase';
+import { UpdateUserPasswordUseCase } from '../../domain/usecases/update-user-password.usecase';
 import { UpdateUserUseCase } from '../../domain/usecases/update-user.usecase';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
+import { UpdateUserInfoDto } from '../dtos/update-user-info.dto';
+import { UpdateUserPasswordDto } from '../dtos/update-user-password.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 
 /**
@@ -35,6 +41,9 @@ export class UsersController {
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly updateUserInfoUseCase: UpdateUserInfoUseCase,
+    private readonly updateUserPasswordUseCase: UpdateUserPasswordUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
   /**
@@ -197,5 +206,77 @@ export class UsersController {
     await this.deleteUserUseCase.execute(id);
 
     return { message: 'Usuário excluído com sucesso' };
+  }
+
+  @Patch('profile/info')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Atualizar informações básicas',
+    description: 'Atualiza apenas o nome e período atual do usuário logado. Para outras atualizações, use as rotas específicas.',
+  })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(401, 'Não autorizado', 'UNAUTHORIZED', 'Não autorizado')
+  @ApiErrorResponse(404, 'Usuário não encontrado', 'NOT_FOUND', 'Usuário não encontrado')
+  async updateInfo(
+  @CurrentUser() currentUser: IJwtPayload,
+    @Body() updateUserInfoDto: UpdateUserInfoDto,
+  ) {
+    const { before, after } = await this.updateUserInfoUseCase.execute(
+      currentUser.sub,
+      updateUserInfoDto,
+    );
+
+    return {
+      message: 'Informações básicas atualizadas com sucesso',
+      data: {
+        before: {
+          id: before.id,
+          name: before.name,
+          currentPeriod: before.currentPeriod,
+          updatedAt: before.updatedAt,
+        },
+        after: {
+          id: after.id,
+          name: after.name,
+          currentPeriod: after.currentPeriod,
+          updatedAt: after.updatedAt,
+        },
+      },
+    };
+  }
+
+  @Patch('profile/password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Atualizar senha', description: 'Atualiza a senha do usuário logado' })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(401, 'Não autorizado', 'UNAUTHORIZED', 'Não autorizado')
+  @ApiErrorResponse(400, 'Senha atual incorreta', 'INVALID_PASSWORD', 'Senha atual incorreta')
+  @ApiErrorResponse(400, 'Nova senha e confirmação não coincidem', 'PASSWORD_MISMATCH', 'Nova senha e confirmação não coincidem')
+  async updatePassword(
+  @CurrentUser() currentUser: IJwtPayload,
+    @Body() updateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
+    await this.updateUserPasswordUseCase.execute(
+      currentUser.sub,
+      updateUserPasswordDto,
+    );
+
+    return {
+      message: 'Senha atualizada com sucesso',
+    };
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Resetar senha', description: 'Envia uma nova senha para o email do usuário' })
+  @ApiResponseWrapped(UserResponseDto)
+  @ApiErrorResponse(404, 'Usuário não encontrado', 'NOT_FOUND', 'Usuário não encontrado')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.resetPasswordUseCase.execute(resetPasswordDto);
+
+    return {
+      message: 'Uma nova senha foi enviada para seu email',
+    };
   }
 }

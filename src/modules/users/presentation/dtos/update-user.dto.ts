@@ -7,10 +7,12 @@
  *
  * @module UserDTOs
  */
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import {
   IsBoolean, IsEmail, IsOptional, IsString, MinLength,
 } from 'class-validator';
+
+import { CreateUserDto } from './create-user.dto';
 
 /**
  * DTO for handling user update requests
@@ -20,7 +22,7 @@ import {
  *
  * @class UpdateUserDto
  */
-export class UpdateUserDto {
+export class UpdateUserDto extends PartialType(OmitType(CreateUserDto, [] as const)) {
   /**
    * Updated full name of the user
    * Optional field, must be a string if provided

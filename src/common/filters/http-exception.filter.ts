@@ -161,6 +161,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }];
     }
 
+    if (exception instanceof BadRequestException) {
+      return [{
+        code: 'BAD_REQUEST',
+        title: 'Requisição inválida',
+        detail: [exception.message || 'Ocorreu um erro ao processar a requisição'],
+      }];
+    }
+
     if (exception instanceof Error) {
       return [{
         code: 'INTERNAL_ERROR',

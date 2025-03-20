@@ -12,6 +12,8 @@ import { UnitsModule } from '@/modules/units/units.module';
 import { UsersModule } from '@/modules/users/users.module';
 import { PrismaModule } from '@/prisma/prisma.module';
 
+import { MailModule } from './modules/mail/mail.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +29,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
     EvaluationItemsModule,
     GradesModule,
     DocumentationModule,
+    MailModule,
   ],
 })
 export class AppModule {}
