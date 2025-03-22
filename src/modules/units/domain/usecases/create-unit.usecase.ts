@@ -45,6 +45,12 @@ export interface ICreateUnitDTO {
    * Used for permission validation
    */
   teacherId: string;
+
+  /**
+   * Optional custom creation date for the unit
+   * If provided, this date will be used instead of the current date
+   */
+  createdAt?: Date;
 }
 
 /**
@@ -79,6 +85,7 @@ export class CreateUnitUseCase {
    */
   async execute(data: ICreateUnitDTO): Promise<Unit> {
     // Verificar se a turma existe
+    console.log('data.classId', data);
     const classExists = await this.classRepository.findById(data.classId);
     if (!classExists) {
       throw new NotFoundException('Turma não encontrada');
@@ -107,6 +114,7 @@ export class CreateUnitUseCase {
       name: data.name,
       classId: data.classId,
       averageFormula: data.averageFormula,
+      createdAt: data.createdAt,
     });
 
     return this.unitRepository.create(newUnit);

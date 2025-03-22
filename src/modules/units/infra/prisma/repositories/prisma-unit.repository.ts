@@ -46,6 +46,7 @@ export class PrismaUnitRepository implements IUnitRepository {
         name: unitData.name,
         classId: unitData.classId,
         averageFormula: unitData.averageFormula,
+        createdAt: unitData.createdAt,
       },
     });
 

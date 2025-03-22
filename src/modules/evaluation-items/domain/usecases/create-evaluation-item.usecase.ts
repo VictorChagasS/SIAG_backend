@@ -42,6 +42,11 @@ export interface ICreateEvaluationItemDTO {
    * Used for permission validation
    */
   teacherId: string;
+
+  /**
+   * Date of creation of the evaluation item
+   */
+  createdAt?: Date;
 }
 
 /**
@@ -120,6 +125,7 @@ export class CreateEvaluationItemUseCase {
     const newEvaluationItem = new EvaluationItem({
       name: data.name,
       unitId: data.unitId,
+      createdAt: data.createdAt,
     });
 
     return this.evaluationItemRepository.create(newEvaluationItem);

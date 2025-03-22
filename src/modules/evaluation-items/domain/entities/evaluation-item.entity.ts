@@ -53,7 +53,8 @@ export class EvaluationItem {
    * @param props Properties to initialize the evaluation item
    * @evaluation-items Constructor
    */
-  constructor(props: Omit<EvaluationItem, 'createdAt' | 'updatedAt'>) {
+
+  constructor(props: Omit<EvaluationItem, | 'updatedAt'>) {
     Object.assign(this, props);
   }
 }

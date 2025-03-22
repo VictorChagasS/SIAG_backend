@@ -45,6 +45,7 @@ export class PrismaEvaluationItemRepository implements IEvaluationItemRepository
       data: {
         name: evaluationItemData.name,
         unitId: evaluationItemData.unitId,
+        createdAt: evaluationItemData.createdAt,
       },
     });
 

@@ -89,7 +89,7 @@ export class EvaluationItemsController {
     @CurrentUser() currentUser: IJwtPayload,
   ) {
     const evaluationItemCreated = await this.createEvaluationItemUseCase.execute({
-      name: createEvaluationItemDto.name,
+      ...createEvaluationItemDto,
       unitId,
       teacherId: currentUser.sub,
     });

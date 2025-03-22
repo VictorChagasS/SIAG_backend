@@ -14,6 +14,7 @@ export interface IUpsertUnitDTO {
   classId: string;
   averageFormula?: string;
   teacherId: string; // ID do professor que está criando/atualizando a unidade
+  createdAt?: Date; // Data de criação personalizada para a unidade
 }
 
 @Injectable()
@@ -57,6 +58,7 @@ export class UpsertUnitUseCase {
       name: data.name,
       classId: data.classId,
       averageFormula: data.averageFormula,
+      createdAt: data.createdAt,
     });
 
     return this.unitRepository.create(newUnit);

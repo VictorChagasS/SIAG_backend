@@ -8,7 +8,10 @@
  * @module UnitDTOs
  */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsDate, IsNotEmpty, IsOptional, IsString,
+} from 'class-validator';
 
 /**
  * DTO for handling unit upsert requests
@@ -47,4 +50,20 @@ export class UpsertUnitDto {
   @IsOptional()
   @IsString({ message: 'A fórmula deve ser uma string' })
     averageFormula?: string;
+
+  /**
+   * Custom creation date for the unit
+   *
+   * Optional field that allows setting a specific creation date for the unit.
+   * If not provided, the system will use the current date.
+   */
+  @ApiProperty({
+    description: 'Data de criação da unidade',
+    example: '2023-04-15T14:30:00Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDate({ message: 'A data de criação deve ser uma data válida' })
+  @Type(() => Date)
+    createdAt?: Date;
 }

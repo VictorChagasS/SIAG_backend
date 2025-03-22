@@ -8,7 +8,7 @@
  * @evaluation-items DTO
  */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
 
 /**
  * DTO for handling evaluation item creation requests
@@ -35,4 +35,15 @@ export class CreateEvaluationItemDto {
   @IsNotEmpty({ message: 'O nome é obrigatório' })
   @IsString({ message: 'O nome deve ser uma string' })
     name: string;
+
+  /**
+   * Date of creation of the evaluation item
+   */
+  @ApiProperty({
+    description: 'Data de criação do item de avaliação',
+    example: '2025-01-01',
+  })
+  @IsNotEmpty({ message: 'A data de criação é obrigatória' })
+  @IsDateString({ strict: true }, { message: 'A data de criação deve ser uma data válida' })
+    createdAt: Date;
 }

@@ -115,6 +115,7 @@ export class UnitsController {
       classId,
       averageFormula: createUnitDto.averageFormula,
       teacherId: currentUser.sub,
+      createdAt: createUnitDto.createdAt,
     });
 
     return unitCreated;
@@ -151,6 +152,7 @@ export class UnitsController {
       classId,
       averageFormula: upsertUnitDto.averageFormula,
       teacherId: currentUser.sub,
+      createdAt: upsertUnitDto.createdAt,
     });
 
     return unit;
