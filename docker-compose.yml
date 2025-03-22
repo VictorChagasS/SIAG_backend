@@ -6,7 +6,7 @@ services:
       target: production
       dockerfile: ./Dockerfile
     image: siag-api-prod
-    command: ["sh", "-c", "npm install csv-parse ts-node && npx prisma generate && npx prisma migrate deploy && npm run start:prod"]
+    command: ["sh", "-c", "npm install csv-parse ts-node && npm run import:universities && npx prisma generate && npx prisma migrate deploy && npm run start:prod"]
     ports:
       - 3000:3000
     volumes:
