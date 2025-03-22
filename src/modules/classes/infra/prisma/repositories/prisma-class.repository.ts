@@ -206,6 +206,9 @@ export class PrismaClassRepository implements IClassRepository {
           select: { students: true },
         },
       },
+      orderBy: {
+        name: 'asc',
+      },
     });
 
     return classes.map((classItem) => {
@@ -241,6 +244,9 @@ export class PrismaClassRepository implements IClassRepository {
         _count: {
           select: { students: true },
         },
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
 
