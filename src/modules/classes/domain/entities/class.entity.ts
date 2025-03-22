@@ -105,7 +105,7 @@ export class Class {
     }
 
     // Define o valor padrão para section se não for fornecido
-    if (props.section === undefined) {
+    if (props.section === undefined || props.section === null) {
       this.section = 1;
     } else {
       this.section = props.section;

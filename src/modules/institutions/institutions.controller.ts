@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,6 +21,15 @@ import { PaginatedInstitutionsResponseDto } from './dtos/paginated-institutions-
 @Controller('institutions')
 export class InstitutionsController {
   constructor(private readonly prisma: PrismaService) {}
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Buscar instituição por ID',
+    description: 'Busca uma instituição pelo ID',
+  })
+  async findById(@Param('id') id: string) {
+    return this.prisma.institution.findUnique({ where: { id } });
+  }
 
   @Get()
   @ApiOperation({

@@ -36,6 +36,7 @@ import { CreateClassDto } from '@/modules/classes/presentation/dtos/create-class
 import { UpdateClassFormulaDto } from '@/modules/classes/presentation/dtos/update-class-formula.dto';
 import { UpdateClassDto } from '@/modules/classes/presentation/dtos/update-class.dto';
 
+import { Class } from '../../domain/entities/class.entity';
 import { ActiveTeacherClassesQueryDto } from '../dto/active-teacher-classes-query.dto';
 import { ListTeacherClassesQueryDto } from '../dto/list-teacher-classes-query.dto';
 import { PaginatedClassResponseDto } from '../dtos/paginated-class-response.dto';
@@ -235,9 +236,16 @@ export class ClassesController {
     @Body() updateClassDto: UpdateClassDto,
     @CurrentUser() currentUser: IJwtPayload,
   ) {
+    const newClass = new Class({
+      name: updateClassDto.name,
+      code: updateClassDto.code,
+      period: updateClassDto.period,
+      section: updateClassDto.section,
+      teacherId: currentUser.sub,
+    });
     const classUpdated = await this.updateClassUseCase.execute(
       id,
-      updateClassDto,
+      newClass,
       currentUser.sub,
     );
 
