@@ -7,6 +7,7 @@ import { ClassesModule } from '@/modules/classes/classes.module';
 import { EvaluationItemsModule } from '@/modules/evaluation-items/evaluation-items.module';
 import { GradesModule } from '@/modules/grades/grades.module';
 import { InstitutionsModule } from '@/modules/institutions/institutions.module';
+import { ReportsModule } from '@/modules/reports/reports.module';
 import { StudentsModule } from '@/modules/students/students.module';
 import { UnitsModule } from '@/modules/units/units.module';
 import { UsersModule } from '@/modules/users/users.module';
@@ -28,6 +29,7 @@ import { MailModule } from './modules/mail/mail.module';
     UnitsModule,
     EvaluationItemsModule,
     GradesModule,
+    ReportsModule,
     DocumentationModule,
     MailModule,
   ],

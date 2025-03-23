@@ -22,6 +22,7 @@ import { CalculateStudentAverageUseCase } from './domain/usecases/calculate-stud
 import { CalculateUnitAverageUseCase } from './domain/usecases/calculate-unit-average.usecase';
 import { CreateGradeUseCase } from './domain/usecases/create-grade.usecase';
 import { UpsertStudentGradesUseCase } from './domain/usecases/create-many-grades.usecase';
+import { GetAllGradesByClassUseCase } from './domain/usecases/get-all-grades-by-class.usecase';
 import { GetGradeUseCase } from './domain/usecases/get-grade.usecase';
 import { GetGradesByUnitUseCase } from './domain/usecases/get-grades-by-unit.usecase';
 import { GetStudentGradesByUnitUseCase } from './domain/usecases/get-student-grades-by-unit.usecase';
@@ -61,10 +62,16 @@ import { GradesController } from './presentation/controllers/grades.controller';
     GetGradeUseCase,
     GetGradesByUnitUseCase,
     GetStudentGradesByUnitUseCase,
+    GetAllGradesByClassUseCase,
     CalculateUnitAverageUseCase,
     CalculateAllAveragesUseCase,
     CalculateStudentAverageUseCase,
   ],
-  exports: [GRADE_REPOSITORY, CalculateStudentAverageUseCase, CalculateAllAveragesUseCase],
+  exports: [
+    GRADE_REPOSITORY,
+    CalculateStudentAverageUseCase,
+    CalculateAllAveragesUseCase,
+    GetAllGradesByClassUseCase,
+  ],
 })
 export class GradesModule {}
