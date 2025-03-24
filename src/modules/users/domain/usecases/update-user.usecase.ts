@@ -1,7 +1,7 @@
 import {
   Inject, Injectable, NotFoundException, ConflictException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 import { USER_REPOSITORY } from '../../users.providers';
 import { User } from '../entities/user.entity';

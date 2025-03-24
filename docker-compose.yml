@@ -1,15 +1,39 @@
 services:
-  siag-api-prod:
-    container_name: siag-api-prod
+  siag-api-dev:
+    container_name: siag-api-dev
     build:
       context: .
-      target: production
+      target: development
       dockerfile: ./Dockerfile
-    image: siag-api-prod
-    command: ["sh", "-c", "npm install csv-parse ts-node && npm run import:universities && npx prisma generate && npx prisma migrate deploy && npm run start:prod"]
+    image: siag-api-dev
+    command: ["sh", "-c", "npm install csv-parse ts-node && npx prisma generate && npx prisma migrate deploy && npm run import:universities && npm run start:dev"]
     ports:
-      - 3000:3000
+      - ${PORT:-3000}:${PORT:-3000}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     restart: unless-stopped
+    depends_on:
+      - postgres-dev
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-dev:5432/postgres
+      - NODE_ENV=development
+      - JWT_SECRET=seu_segredo_super_secreto_para_jwt
+      - JWT_EXPIRES_IN=1d
+      - PORT=${PORT:-3000}
+
+  postgres-dev:
+    container_name: siag-postgres-dev
+    image: postgres:14-alpine
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_dev:

@@ -6,13 +6,13 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 import { AuthenticateUserUseCase } from '@/modules/auth/domain/usecases/authenticate-user.usecase';
 import { IUserRepository } from '@/modules/users/domain/repositories/user-repository.interface';
 
 // Mock bcrypt to control its behavior in tests
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 
 describe('AuthenticateUserUseCase', () => {
   let useCase: AuthenticateUserUseCase;
