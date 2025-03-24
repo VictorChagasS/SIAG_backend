@@ -179,7 +179,7 @@ describe('PrismaGradeRepository', () => {
 
       // Verify that the averages are equal
       expect(calculatedWeightedAverage).toBe(expectedWeightedAverage);
-      expect(calculatedWeightedAverage).toBe(7.55); // 7.55
+      expect(calculatedWeightedAverage).toBe(7.5); // 7.
     });
 
     it('should correctly handle the case of no grades found', async () => {

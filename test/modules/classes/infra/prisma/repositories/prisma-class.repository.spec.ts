@@ -315,6 +315,9 @@ describe('PrismaClassRepository', () => {
             select: { students: true },
           },
         },
+        orderBy: {
+          name: 'asc',
+        },
       });
 
       expect(result).toHaveLength(2);

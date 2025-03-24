@@ -14,8 +14,8 @@ import { IUserRepository } from '@/modules/users/domain/repositories/user-reposi
 import { CreateUserUseCase, ICreateUserDTO } from '@/modules/users/domain/usecases/create-user.usecase';
 import { USER_REPOSITORY } from '@/modules/users/users.providers';
 
-// Mock bcrypt to control password hashing in tests
-jest.mock('bcrypt', () => ({
+// Mock bcryptjs to control password hashing in tests
+jest.mock('bcryptjs', () => ({
   hash: jest.fn().mockResolvedValue('hashed_password'),
 }));
 
