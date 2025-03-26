@@ -1,5 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import {
+  Inject, Injectable, NotFoundException, ConflictException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 
 import { USER_REPOSITORY } from '../../users.providers';
 import { User } from '../entities/user.entity';
@@ -12,6 +14,11 @@ export interface IUpdateUserDTO {
   isAdmin?: boolean;
 }
 
+export interface IUpdateUserResponse {
+  before: User;
+  after: User;
+}
+
 @Injectable()
 export class UpdateUserUseCase {
   constructor(
@@ -19,18 +26,18 @@ export class UpdateUserUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(id: string, data: IUpdateUserDTO): Promise<User> {
+  async execute(id: string, data: IUpdateUserDTO): Promise<IUpdateUserResponse> {
     const user = await this.userRepository.findById(id);
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     // Se estiver atualizando o email, verifica se já existe
     if (data.email && data.email !== user.email) {
       const userWithEmail = await this.userRepository.findByEmail(data.email);
       if (userWithEmail) {
-        throw new Error('Email já está em uso');
+        throw new ConflictException('Email já está em uso');
       }
     }
 
@@ -40,6 +47,11 @@ export class UpdateUserUseCase {
       updatedData.password = await bcrypt.hash(data.password, 10);
     }
 
-    return this.userRepository.update(id, updatedData);
+    const updatedUser = await this.userRepository.update(id, updatedData);
+
+    return {
+      before: user,
+      after: updatedUser,
+    };
   }
 }

@@ -1,3 +1,14 @@
+/**
+ * HTTP Exception Filter
+ *
+ * A global exception filter that catches and formats all exceptions
+ * in a standardized way for consistent API error responses.
+ *
+ * This filter handles various exception types and converts them into
+ * a consistent error format that is easier for API consumers to process.
+ *
+ * @module CommonFilters
+ */
 import {
   ExceptionFilter,
   Catch,
@@ -11,14 +22,45 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
+/**
+ * Standard error response structure
+ *
+ * Defines the format of error objects returned in API responses.
+ * Each error has a code, title, and detailed messages.
+ *
+ * @interface IErrorResponse
+ */
 interface IErrorResponse {
+  /** Machine-readable error code for programmatic handling */
   code: string;
+
+  /** Human-readable error title */
   title: string;
+
+  /** Array of detailed error messages */
   detail: string[];
 }
 
+/**
+ * Global HTTP exception filter
+ *
+ * Catches all exceptions thrown during request processing and
+ * transforms them into a standardized error response format.
+ *
+ * @class HttpExceptionFilter
+ * @implements {ExceptionFilter}
+ */
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  /**
+   * Main exception handler method
+   *
+   * Processes the caught exception and formats it into a standardized
+   * error response for the client.
+   *
+   * @param {unknown} exception - The exception that was thrown
+   * @param {ArgumentsHost} host - The host arguments (contains request/response objects)
+   */
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -28,6 +70,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(this.getStatusCode(exception)).json({ errors });
   }
 
+  /**
+   * Formats exceptions into standardized error responses
+   *
+   * Converts different types of exceptions into the standard error format
+   * with appropriate codes, titles, and details.
+   *
+   * @param {unknown} exception - The exception to format
+   * @returns {IErrorResponse[]} Array of formatted error responses
+   * @private
+   */
   private formatErrors(exception: unknown): IErrorResponse[] {
     if (exception instanceof BadRequestException) {
       const response = exception.getResponse() as any;
@@ -109,6 +161,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }];
     }
 
+    if (exception instanceof BadRequestException) {
+      return [{
+        code: 'BAD_REQUEST',
+        title: 'Requisição inválida',
+        detail: [exception.message || 'Ocorreu um erro ao processar a requisição'],
+      }];
+    }
+
     if (exception instanceof Error) {
       return [{
         code: 'INTERNAL_ERROR',
@@ -124,6 +184,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }];
   }
 
+  /**
+   * Extracts the field name from a validation error message
+   *
+   * Uses regex patterns to identify which field a validation error
+   * is referring to, which helps in grouping related errors.
+   *
+   * @param {string} error - The validation error message
+   * @returns {string} The extracted field name, or 'unknown' if not found
+   * @private
+   */
   private extractFieldName(error: string): string {
     // Primeiro, tenta encontrar o padrão "field 'nome'"
     const fieldMatch = error.match(/(?:field|property) '(\w+)'/i);
@@ -141,11 +211,31 @@ export class HttpExceptionFilter implements ExceptionFilter {
     return 'unknown';
   }
 
+  /**
+   * Formats a validation error message for better readability
+   *
+   * Removes redundant parts of the error message, such as field
+   * name references that are already handled through grouping.
+   *
+   * @param {string} error - The original validation error message
+   * @returns {string} The formatted error message
+   * @private
+   */
   private formatValidationError(error: string): string {
     // Remove referências ao nome do campo do início da mensagem
     return error.replace(/^(?:field|property) '\w+' /, '');
   }
 
+  /**
+   * Determines the appropriate HTTP status code for the response
+   *
+   * Extracts the status code from HTTP exceptions or defaults to 500
+   * for other types of errors.
+   *
+   * @param {unknown} exception - The exception to get the status code from
+   * @returns {number} The HTTP status code
+   * @private
+   */
   private getStatusCode(exception: unknown): number {
     if (exception instanceof HttpException) {
       return exception.getStatus();

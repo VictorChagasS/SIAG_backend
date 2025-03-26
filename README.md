@@ -64,6 +64,47 @@ Antes de começar, certifique-se de que você tem instalado em sua máquina:
    NODE_ENV=development
    ```
 
+## Configuração Docker
+
+O projeto SIAG inclui configurações Docker para execução em ambientes de desenvolvimento e produção, incluindo o banco de dados PostgreSQL.
+
+### Ambiente de Desenvolvimento
+
+Para executar a aplicação em ambiente de desenvolvimento usando Docker:
+
+```bash
+# Executar aplicação e banco de dados PostgreSQL em desenvolvimento
+docker-compose up -d
+```
+
+Esta configuração:
+- Inicia o serviço `siag-api-dev` em modo de desenvolvimento
+- Configura o banco de dados PostgreSQL com usuário e senha padrão
+- Mapeia a porta 3000 para acesso à API
+- Utiliza volumes para persistência de dados do PostgreSQL
+
+### Ambiente de Produção
+
+Para ambientes de produção:
+
+```bash
+# Executar aplicação e banco de dados PostgreSQL em produção
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+A configuração de produção:
+- Inicia o serviço `siag-api-prod` otimizado para produção
+- Configura o banco PostgreSQL com credenciais fixas
+- Utiliza volume dedicado para persistência de dados
+
+### Considerações
+
+- Os bancos de dados têm volumes diferentes para desenvolvimento e produção, portanto os dados não são compartilhados
+- Em um ambiente real de produção, você pode querer considerar:
+  - Usar senhas mais seguras
+  - Configurar backups para o volume do PostgreSQL
+  - Utilizar HTTPS para comunicação com a API
+
 ## Rodando o Projeto
 
 ### Usando npm (Desenvolvimento Local)

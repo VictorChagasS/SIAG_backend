@@ -9,6 +9,8 @@ export class User {
 
   isAdmin: boolean;
 
+  currentPeriod?: string;
+
   institutionId: string;
 
   createdAt?: Date;

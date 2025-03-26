@@ -1,0 +1,15 @@
+services:
+  siag-api-prod:
+    container_name: siag-api-prod
+    build:
+      context: .
+      target: production
+      dockerfile: ./Dockerfile
+    image: siag-api-prod
+    command: ["sh", "-c", "npm install csv-parse ts-node && npm run import:universities && npx prisma generate && npx prisma migrate deploy && npm run start:prod"]
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped

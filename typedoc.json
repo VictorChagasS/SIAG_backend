@@ -1,0 +1,19 @@
+{
+  "entryPoints": ["src"],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "categoryOrder": ["Domain", "UseCase", "Controller", "DTO", "Entity", "*"],
+  "name": "SIAG API Documentation",
+  "readme": "README.md",
+  "theme": "default",
+  "tsconfig": "tsconfig.json",
+  "hideGenerator": true,
+  "plugin": ["typedoc-plugin-merge-modules"],
+  "searchInComments": true,
+  "sort": ["source-order"]
+} 

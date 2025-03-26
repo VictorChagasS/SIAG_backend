@@ -9,9 +9,17 @@ import { UsersController } from '@/modules/users/presentation/controllers/users.
 import { usersProviders } from '@/modules/users/users.providers';
 
 import { AuthModule } from '../auth/auth.module';
+import { MailModule } from '../mail/mail.module';
+
+import { ResetPasswordUseCase } from './domain/usecases/reset-password.usecase';
+import { UpdateUserInfoUseCase } from './domain/usecases/update-user-info.usecase';
+import { UpdateUserPasswordUseCase } from './domain/usecases/update-user-password.usecase';
 
 @Module({
-  imports: [forwardRef(() => AuthModule)],
+  imports: [
+    forwardRef(() => AuthModule),
+    MailModule,
+  ],
   controllers: [UsersController],
   providers: [
     CreateUserUseCase,
@@ -19,6 +27,9 @@ import { AuthModule } from '../auth/auth.module';
     ListUsersUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
+    UpdateUserInfoUseCase,
+    UpdateUserPasswordUseCase,
+    ResetPasswordUseCase,
     ...usersProviders,
   ],
   exports: [
